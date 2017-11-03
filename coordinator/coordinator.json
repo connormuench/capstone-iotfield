@@ -1,0 +1,9 @@
+{
+	"server-ip": "127.0.0.1",
+    "server-port": 3000,
+    "local-db-path": "coordinator.db",
+    "xbee-port": "/dev/ttyAMA0",
+    "xbee-baudrate": 115200,
+    "xbee-reset-rpi-bcm-pin": 4,
+    "xbee-cts-rpi-bcm-pin": 16
+}
