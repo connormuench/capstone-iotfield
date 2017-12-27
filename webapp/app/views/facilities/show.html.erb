@@ -1,0 +1,29 @@
+<div class="row mb-2 mt-5 mx-auto">
+  <div class="col-xs my-auto">
+    <h1><%= @facility.name %></h1>
+  </div>
+
+  <% if current_user.is_admin %>
+    <div class="col-xs ml-3 my-auto">
+      <div class="btn-group" role="group" aria-label="Manipulate facility">
+        <%= link_to ion_icon('edit'), edit_facility_path(@facility), class: 'btn btn-info facility-manip', title: 'Edit the facility' %>
+
+        <%= link_to ion_icon('trash-b'), facility_path(@facility), method: :delete, class: 'btn btn-danger facility-manip', title: 'Delete the facility', data: { confirm: 'Are you sure?' } %>
+      </div>
+    </div>
+  <% end %>
+
+  <% if current_user.access_levels.find { |access_level| access_level.facility == @facility && access_level.level == 'Controller' }.present? %>
+    <div class="col-xs ml-auto my-auto">
+      <div class="btn-group" data-toggle="buttons">
+        <label class="btn btn-secondary active">
+          <input type="radio" name="pointTypes" id="manualOption" autocomplete="off" checked> Manual
+        </label>
+        <label class="btn btn-secondary">
+          <input type="radio" name="pointTypes" id="automaticOption" autocomplete="off"> Automatic
+        </label>
+      </div>
+    </div>
+  <% end %>
+  <% console %>
+</div>

@@ -1,0 +1,199 @@
+<div class="row mb-2 mt-5 mx-auto">
+  <div class="col-xs my-auto">
+    <h1>Facilities</h1>
+  </div>
+
+  <% if current_user.is_admin %>
+    <div class="col-xs ml-3 my-auto pb-2">
+      <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addFacilityModal"><%= ion_icon "plus" %></button>
+    </div>
+  <% end %>
+</div>
+
+<% current_user.access_levels.each do |access_level| %>
+  <% facility = access_level.facility %>
+  <div class="card">
+    <div class="card-header" role="tab" id="heading<%= facility.id %>">
+      <div class="row mx-auto">
+        <div class="col-xs ml-0 my-auto">
+          <a data-toggle="collapse" href="#facility<%= facility.id %>" aria-expanded="true" aria-controls="facility<%= facility.id %>">
+            <h5 class="mb-0"><%= facility.name %></h5>
+          </a>
+        </div>
+        <div class="col-xs ml-2 my-auto">
+          <span class="ion-<%= ('wrench' if access_level.level == 'Controller') || 'eye' %>" title="You are a <%= access_level.level.downcase %> of this facility"></span>
+        </div>
+        <div class="col-xs ml-auto my-auto">
+          <div class="btn-group" role="group" aria-label="Manipulate facility">
+            <%= link_to ion_icon('information'), facility_path(facility), class: 'btn btn-primary btn-sm facility-manip', title: 'View the facility' %>
+            <% if current_user.is_admin %>
+              <%= link_to ion_icon('trash-b'), facility_path(facility), method: :delete, class: 'btn btn-danger btn-sm facility-manip', title: 'Delete the facility', data: { confirm: 'Are you sure?' } %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="facility<%= facility.id %>" class="collapse" role="tabpanel" aria-labelledby="heading<%= facility.id %>">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-lg-4">
+            <b>Network address: </b><%= facility.network_address + ':' + facility.network_port.to_s %>
+          </div>
+          <% if facility.location.present? %>
+            <div class="col-lg-4">
+              <b>Location: </b><%= facility.location %>
+            </div>
+          <% end %>
+        </div>
+        <% if facility.description.present? %>
+          <p class="mt-2">
+            <%= facility.description %>
+          </p>
+        <% end %>
+        <% if facility.points.any? %>
+          <div class="row">
+            <% facility.points.each do |point| %>
+              <div class="col-lg-4">
+                <b><%= link_to point.name, [facility, point.pointable], data: {toggle: 'popover', placement: 'bottom', content: point.description, container: 'body', trigger: 'hover'} %>: </b>
+                <%= (point.records.last.value.to_s + ' ' + point.records.last.unit if point.records.any?) || 'No data' %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+        <% if current_user.is_admin %>
+          <div class="row mx-auto">
+            <div class="col-xs ml-auto">
+              <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addPointModal" data-facility-id="<%= facility.id %>">Add Point</button>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<!-- Add Facility Modal -->
+<div class="modal fade" id="addFacilityModal" tabindex="-1" role="dialog" aria-labelledby="addFacilityModalLLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addFacilityModalLLabel">Add Facility</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <%= form_for Facility.new, html: {id: 'addFacilityForm'} do |f| %>
+          <div class="form-group">
+            <%= f.label :name, class: 'required' %>
+            <%= f.text_field :name, class: 'form-control', placeholder: 'Name' %>
+          </div>
+          <div class="form-group">
+            <%= f.label :network_address, class: 'required' %>
+            <%= f.text_field :network_address, class: 'form-control', placeholder: 'Facility IP address' %>
+          </div>
+          <div class="form-group">
+            <%= f.label :network_port, class: 'required' %>
+            <%= f.text_field :network_port, class: 'form-control', placeholder: 'Facility port number' %>
+          </div>
+          <div class="form-group">
+            <%= f.label :location %>
+            <%= f.text_field :location, class: 'form-control', placeholder: 'Coordinates or address' %>
+          </div>
+          <div class="form-group">
+            <%= f.label :description %>
+            <%= f.text_area :description, class: 'form-control' %>
+          </div>
+        <% end %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-success" onclick="$('#addFacilityForm').submit()">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Point Modal -->
+<div class="modal fade" id="addPointModal" tabindex="-1" role="dialog" aria-labelledby="addPointModalLLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addPointModalLLabel">Add Point</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="btn-group" data-toggle="buttons">
+          <label class="btn btn-primary active">
+            <input type="radio" name="pointTypes" id="sensorOption" autocomplete="off" checked> Sensor
+          </label>
+          <label class="btn btn-primary">
+            <input type="radio" name="pointTypes" id="controllableDeviceOption" autocomplete="off"> Controllable device
+          </label>
+        </div>
+        <%= form_for '', as: :post, html: {id: 'addPointForm', onsubmit: 'submitted(this)'} do |f| %>
+          <%= fields_for :point do |ff| %>
+            <div class="form-group">
+              <%= ff.label :name, class: 'required' %>
+              <%= ff.text_field :name, class: 'form-control', placeholder: 'Name' %>
+            </div>
+            <div class="form-group">
+              <%= f.label :address, class: 'required' %>
+              <%= f.text_field :address, class: 'form-control', placeholder: 'Address' %>
+            </div>
+            <div class="form-group">
+              <%= ff.label :remote_id, class: 'required' %>
+              <%= ff.text_field :remote_id, class: 'form-control', placeholder: 'Remote ID' %>
+            </div>
+            <div class="form-group">
+              <%= ff.label :location %>
+              <%= ff.text_field :location, class: 'form-control', placeholder: 'Coordinates or address' %>
+            </div>
+            <div class="form-group">
+              <%= ff.label :description %>
+              <%= ff.text_area :description, class: 'form-control' %>
+            </div>
+          <% end %>
+          <div id="controllableDeviceSection" style="display: none;">
+            <div class="row mx-auto">
+              <div class="col-xs my-auto">
+                <h5>Automation Rules</h5>
+              </div>
+              <div class="col-xs ml-3 my-auto pb-2">
+                <button type="button" class="btn btn-success btn-sm" onclick="addRuleRow()"><%= ion_icon "plus" %></button>
+              </div>
+            </div>
+            <% require "json" %>
+            <% available_points = {} %>
+            <% current_user.facilities.each do |facility| %>
+              <% facility.points.each do |point| %>
+                <% if not available_points.key?(facility.id) %>
+                  <% available_points[facility.id] = [] %>
+                <% end %>
+                <% available_points[facility.id].push('{' + point.name + '|' + point.end_device.address + ':' + point.remote_id.to_s + '}') %>
+              <% end %>
+            <% end %>
+            <table class="table table-bordered table-hover table-sm" id="rules-table" data-points="<%= available_points.to_json %>">
+              <thead>
+                <tr>
+                  <th scope="col">Active</th>
+                  <th scope="col">Expression</th>
+                  <th scope="col">Action</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody id="rule-rows">
+              </tbody>
+            </table>
+          </div>
+        <% end %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-success" onclick="$('#addPointForm').submit()">Add</button>
+    </div>
+  </div>
+</div>
