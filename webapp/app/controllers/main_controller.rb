@@ -21,7 +21,12 @@ class MainController < ApplicationController
     end
 
     respond_to do |format|
-      format.html
+      format.html {
+        @access_levels = []
+        @facilities.each do |facility|
+          @access_levels.concat(facility.access_levels.select { |access_level| access_level.user_id == current_user.id })
+        end
+      }
       format.json {
         @facilities = @facilities[0..4].map do |facility| 
           {

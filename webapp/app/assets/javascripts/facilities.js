@@ -5,12 +5,12 @@ function ready() {
     var maxwidth = 10;
 
     // See if there's anything larger and set all buttons to the same width
-    $(".facility-manip").each(function() {
+    $(".manip-button").each(function() {
         if ($(this).width() > maxwidth) {
             maxwidth = $(this).width();
         }
     });
-    $(".facility-manip").width(maxwidth);
+    $(".manip-button").width(maxwidth);
 
     $("input:radio[name=pointTypes]").on("change", function() {
         $("#addPointForm").attr("action", $(this).data("url"));
@@ -32,7 +32,7 @@ function ready() {
     $('[data-toggle="popover"]').popover();
 }
 
-$(document).on("turbolinks:load", ready);
+$(document).ready(ready);
 
 function addRuleRow() {
     var row = $("#rule-rows").append($("<tr>")
@@ -41,7 +41,7 @@ function addRuleRow() {
             .append($("<div>")
                 .attr("class", "form-check my-auto")
                 .append($("<label>")
-                    .attr("class", "custom-control custom-checkbox my-auto mx-auto")
+                    .attr("class", "custom-control custom-checkbox my-auto mx-auto is-active-checkbox")
                     .append($("<input>")
                         .attr("type", "hidden")
                         .attr("name", "rules_attributes[][is_active]")
@@ -70,8 +70,7 @@ function addRuleRow() {
                         .append($("<span>")
                             .attr("class", "ion-radio-waves")))
                     .append($("<div>")
-                        .attr("class", "dropdown-menu dropdown-menu-right")
-                        .attr("id", "pointDropdown")
+                        .attr("class", "dropdown-menu dropdown-menu-right pointDropdown")
                         .append($("<span>")
                             .attr("class", "dropdown-item")
                             .append($("<input>")
@@ -93,8 +92,9 @@ function addRuleRow() {
                 .append($("<span>")
                     .attr("class", "ion-trash-b")))));
 
+    var dropdown = $("#rule-rows").children("tr").last().find(".pointDropdown");
     $("#rules-table").data("points")[facId].forEach(function (value) {
-        $("#pointDropdown").append($("<a>")
+        dropdown.append($("<a>")
             .attr("class", "dropdown-item")
             .attr("href", "#")
             .attr("onclick", "return facilityClicked(this)")
@@ -102,11 +102,14 @@ function addRuleRow() {
     });
 }
 
-// function submitted(form) {
-//     console.log("submitted")
-//     console.log(JSON.stringify(form));
-//     return true;
-// }
+function submitted() {
+    $(".is-active-checkbox").each(function() {
+        if ($(this).find("input:checkbox")[0].checked) {
+            $(this).find("input:hidden").attr("disabled", true);
+        }
+    });
+    return true;
+}
 
 function deleteRuleRow(deleteButton) {
     deleteButton.closest("tr").remove();
@@ -121,7 +124,8 @@ function updateList(textField) {
         var textFieldVal = $(textField).val();
         var indexOfQuery = lowerVal.indexOf(textFieldVal);
         if (textFieldVal == "" || indexOfQuery != -1) {
-            $("#pointDropdown").append($("<a>")
+            var dropdown = $(textField.closest("tr")).find(".pointDropdown");
+            dropdown.append($("<a>")
                 .attr("class", "dropdown-item")
                 .attr("href", "#")
                 .attr("onclick", "return facilityClicked(this)")
@@ -139,4 +143,13 @@ function facilityClicked(element) {
     expressionTextbox.val(textboxVal + $(element).text());
     expressionTextbox.focus();
     return false;
+}
+
+function editFacility() {
+    $(".form-toggle").toggle();
+}
+
+function discardChanges() {
+    $('#editFacilityForm').trigger("reset");
+    $(".form-toggle").toggle();   
 }

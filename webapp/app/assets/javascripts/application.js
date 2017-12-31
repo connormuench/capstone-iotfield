@@ -12,7 +12,7 @@
 //
 //= require jquery3
 //= require rails-ujs
-//= require turbolinks
+// require turbolinks
 //= require_tree .
 
 //= require popper
@@ -26,44 +26,66 @@ function autocompleteSearch(textbox) {
         $.get(jTextbox.closest("form").attr("action") + ".json", 
             {q: query}, 
             function(data) {
-                console.log(data);
                 dropdownMenu.children().remove();
                 Object.keys(data).forEach(function(key) {
-                    dropdownMenu.append($("<h6>")
-                        .attr("class", "dropdown-header")
-                        .text(key.replace("_", " ").replace(/(?:^|\s)\w/g, function(match) {
-                            return match.toUpperCase();
-                        })));
-                    data[key].forEach(function(item) {
-                        value = item.name;
-                        indexOfQuery = value.indexOf(query);
-                        dropdownMenu.append($("<a>")
-                            .attr("class", "dropdown-item")
-                            .attr("href", item.url)
-                            .html(value.replace(new RegExp(query, "i"), function(match) {
-                                return "<b>" + match + "</b>";
+                    if (data[key].length > 0) {
+                        dropdownMenu.append($("<h6>")
+                            .attr("class", "dropdown-header")
+                            .text(key.replace("_", " ").replace(/(?:^|\s)\w/g, function(match) {
+                                return match.toUpperCase();
                             })));
-                    });
+                        data[key].forEach(function(item) {
+                            value = item.name;
+                            indexOfQuery = value.indexOf(query);
+                            dropdownMenu.append($("<a>")
+                                .attr("class", "dropdown-item")
+                                .attr("href", item.url)
+                                .html(value.replace(new RegExp(query, "i"), function(match) {
+                                    return "<b>" + match + "</b>";
+                                })));
+                        });
+                    }
                 });
+                if (dropdownMenu.children().length > 0) {
+                    showSearchDropdown();
+                } else {
+                    hideSearchDropdown();
+                }
             });
     } else {
         dropdownMenu.children().remove();
+        hideSearchDropdown();
     }
 }
 
-$(document).on("turbolinks:load", function() {
+$(document).ready(function() {
     $("#searchBox").on("click", function(event) {
-        event.preventDefault();
         event.stopPropagation();
     });
 
-    $("#searchBox").focus(function(event) {
-        $("#searchDropdown").addClass("show").find(".dropdown-menu").addClass("show");
+    $("#searchBox").on("focus", function(e) {
+        showSearchDropdown();
     });
 
-    $("#searchBox").focusout(function(event) {
-        console.log("done");
-        $("#searchDropdown").removeClass("show").find(".dropdown-menu").removeClass("show");
-
+    $("#searchBox").on("blur", function(e) {
+        if (!$("#searchDropdown").has(e.relatedTarget)) {
+            hideSearchDropdown(e);
+        }
     });
+
+    $('[data-toggle="tooltip"]').tooltip();
 })
+
+function showSearchDropdown() {
+    var dropdown = $("#searchDropdown");
+    if ($("#searchBox").val() != "" && !dropdown.hasClass("show")) {
+        dropdown.addClass("show").find(".dropdown-menu").addClass("show");
+    }
+}
+
+function hideSearchDropdown() {
+    var dropdown = $("#searchDropdown");
+    if (dropdown.hasClass("show")) {
+        dropdown.removeClass("show").find(".dropdown-menu").removeClass("show");
+    }
+}

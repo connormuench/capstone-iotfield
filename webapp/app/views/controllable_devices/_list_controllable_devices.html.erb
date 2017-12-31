@@ -1,0 +1,53 @@
+<% @controllable_devices.each do |controllable_device| %>
+  <div class="card">
+    <div class="card-header" role="tab" id="controllableDeviceHeading<%= controllable_device.id %>">
+      <div class="row mx-auto">
+        <div class="col-xs ml-0 my-auto">
+          <a data-toggle="collapse" href="#controllable_device<%= controllable_device.id %>" aria-expanded="true" aria-controls="controllable_device<%= controllable_device.id %>">
+            <h5 class="mb-0"><%= controllable_device.point.name %></h5>
+          </a>
+          <%= (controllable_device.point.records.last.value.to_s + ' ' + controllable_device.point.records.last.unit if controllable_device.point.records.any?) || 'No data' %>
+        </div>
+        <div class="col-xs ml-auto my-auto">
+          <div class="btn-group" role="group" aria-label="Manipulate controllable device">
+            <%= link_to ion_icon('information'), facility_controllable_device_path(controllable_device.point.end_device.facility.id, controllable_device), class: 'btn btn-primary btn-sm manip-button', title: 'View the controllable device' %>
+            <% if current_user.is_admin %>
+              <%= link_to ion_icon('trash-b'), facility_controllable_device_path(controllable_device.point.end_device.facility.id, controllable_device), method: :delete, class: 'btn btn-danger btn-sm manip-button', title: 'Delete the controllable device', data: { confirm: 'Are you sure?' } %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="collapse" role="tabpanel" aria-labelledby="controllableDeviceHeading<%= controllable_device.id %>" id="controllable_device<%= controllable_device.id %>">
+      <div class="card-body">
+        <div class="row mx-auto">
+          <div class="col-lg-6 col-md-12 col-sm-6">
+            <b>Remote ID: </b><%= controllable_device.point.end_device.address + ':' + controllable_device.point.remote_id.to_s %>
+          </div>
+          <% if controllable_device.point.location.present? %>
+            <div class="col-lg-6 col-md-12 col-sm-6">
+              <b>Location: </b><%= controllable_device.point.location %>
+            </div>
+          <% end %>
+        </div>
+        <div class="row mx-auto">
+          <div class="col-lg-6 col-md-12 col-sm-6">
+            <b>Mode: </b><%= controllable_device.mode %>
+          </div>
+          <div class="col-lg-6 col-md-12 col-sm-6">
+            <b>Status: </b><%= controllable_device.status %>
+          </div>
+        </div>
+        <% if controllable_device.point.description.present? %>
+          <div class="row mx-auto">
+            <div class="col-12">
+              <p>
+                <%= controllable_device.point.description %>
+              </p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

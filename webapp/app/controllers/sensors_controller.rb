@@ -62,6 +62,9 @@ class SensorsController < ApplicationController
 
   # DELETE facilities/1/sensors/1
   def destroy
+    if @sensor.end_device.length == 1
+      @sensor.end_device.destroy
+    end
     @sensor.destroy
     redirect_to sensors_url, notice: 'Sensor was successfully destroyed.'
   end

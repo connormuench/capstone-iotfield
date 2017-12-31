@@ -10,6 +10,15 @@ class FacilitiesController < ApplicationController
 
   # GET /facilities/1
   def show
+    @controllable_devices = []
+    @sensors = []
+
+    @facility.end_devices.each do |end_device|
+      @controllable_devices.concat(end_device.controllable_devices)
+      @sensors.concat(end_device.sensors)
+    end
+
+    @access_level = current_user.access_levels.where(facility_id: @facility.id).first
   end
 
   # POST /facilities
