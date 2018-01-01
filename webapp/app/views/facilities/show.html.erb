@@ -10,10 +10,12 @@
 
     <% if current_user.is_admin %>
       <div class="col-xs my-auto">
+        <!-- Form submission button group -->
         <div class="btn-group form-toggle" role="group" aria-label="Manipulate facility" style="display: none;">
           <a href="javascript:void(0)" class="btn btn-success" title="Save changes" onclick="$('#editFacilityForm').submit()"><%= ion_icon('checkmark') %></a>
           <a href="javascript:void(0)" class="btn btn-danger" title="Discard changes" onclick="discardChanges()"><%= ion_icon('close') %></a>
         </div>
+        <!-- Facility manipulation button group -->
         <div class="btn-group form-toggle" role="group" aria-label="Manipulate facility">
           <a href="javascript:void(0)" class="btn btn-success" data-toggle="modal" data-target="#addPointModal" data-facility-id="<%= @facility.id %>" title="Add a new point"><%= ion_icon('plus') %></a>
           <%= link_to ion_icon('edit'), 'javascript:void(0)', class: 'btn btn-info facility-manip', title: 'Edit the facility', onclick: 'editFacility()' %>
@@ -84,5 +86,3 @@
 </div>
 
 <%= render partial: 'add_point_modal' %>
-
-<% console %>

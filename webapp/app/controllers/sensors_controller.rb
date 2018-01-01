@@ -1,11 +1,11 @@
 class SensorsController < ApplicationController
   before_action :set_sensor, only: [:show, :update, :destroy]
 
-  # GET facilities/1/sensors/1
+  # GET /facilities/1/sensors/1
   def show
   end
 
-  # POST facilities/1/sensors
+  # POST /facilities/1/sensors
   def create
     @sensor = Sensor.new
     facility = Facility.find(params[:facility_id])
@@ -14,6 +14,7 @@ class SensorsController < ApplicationController
     end_devices = facility.end_devices
     found_end_device = nil
 
+    # See if the end device already exists in the database
     end_devices.each do |end_device|
       if end_device.address == address
         found_end_device = end_device
@@ -21,7 +22,9 @@ class SensorsController < ApplicationController
       end
     end
 
+    # Establish a rollback point in case anything fails to save
     ActiveRecord::Base.transaction do
+      # Create a new end device if an existing one wasn't found
       if found_end_device.nil?
         found_end_device = facility.end_devices.new(address: address)
         if not found_end_device.save
@@ -29,21 +32,12 @@ class SensorsController < ApplicationController
         end
       end
 
+      # Create a new point under the end device and assign the sensor to it
       point = found_end_device.points.new(point_params)
       point.pointable = @sensor
 
-      if not point.save
-        render :new
-        raise ActiveRecord::Rollback
-      end
-
-      if facility.save
-        if @sensor.save
+      if point.save
           redirect_to [facility, @sensor], notice: 'Sensor was successfully created.'
-        else
-          render :new
-          raise ActiveRecord::Rollback
-        end
       else
         render :new
         raise ActiveRecord::Rollback
@@ -51,7 +45,7 @@ class SensorsController < ApplicationController
     end
   end
 
-  # PATCH/PUT facilities/1/sensors/1
+  # PATCH/PUT /facilities/1/sensors/1
   def update
     if @sensor.update(sensor_params)
       redirect_to @sensor, notice: 'Sensor was successfully updated.'
@@ -60,7 +54,7 @@ class SensorsController < ApplicationController
     end
   end
 
-  # DELETE facilities/1/sensors/1
+  # DELETE /facilities/1/sensors/1
   def destroy
     if @sensor.end_device.length == 1
       @sensor.end_device.destroy

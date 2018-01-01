@@ -3,7 +3,6 @@ class FacilitiesController < ApplicationController
   before_action :authenticate_user!
 
   # GET /facilities
-  # GET /facilities.json
   def index
     @facilities = Facility.all
   end
@@ -25,6 +24,7 @@ class FacilitiesController < ApplicationController
   def create
     @facility = Facility.new(facility_params)
 
+    # Make all admins controllers of any new facility
     User.all.select { |user| user.is_admin }.each do |admin|
       @facility.access_levels.new(user_id: admin.id, level: 'Controller')
     end
@@ -54,12 +54,11 @@ class FacilitiesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
     def set_facility
       @facility = Facility.find(params[:id])
     end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
+    # Never trust parameters from the scary internet, only allow the white list through
     def facility_params
       params.require(:facility).permit(:name, :description, :location, :network_port, :network_address)
     end

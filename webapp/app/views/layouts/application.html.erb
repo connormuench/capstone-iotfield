@@ -9,8 +9,10 @@
   </head>
 
   <body>
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-md navbar-dark bg-dark">
       <div class="container">
+        <!-- Home button -->
         <%= link_to facilities_path(), class: 'navbar-brand' do %>
           <h3 class="my-auto ml-auto"><%= ion_icon("android-home") %></h3>
         <% end %>
@@ -18,8 +20,10 @@
           <span class="navbar-toggler-icon"></span>
         </button>
 
+        <!-- Collapsible navbar content -->
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <% if user_signed_in? %>
+            <!-- Search bar -->
             <form class="form-inline my-2 my-lg-0" action="<%= search_path() %>">
               <div class="dropdown" id="searchDropdown">
                 <input class="form-control mr-sm-2" id="searchBox" type="search" placeholder="Find anything" aria-label="Search" name="q" data-toggle="dropdown" autocomplete="off" onkeyup="autocompleteSearch(this)">
@@ -28,6 +32,8 @@
               </div>
               <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
             </form>
+
+            <!-- Visualization link -->
             <ul class="navbar-nav ml-md-2">
               <li class="nav-item">
                 <a class="nav-link" href="#">Visualization</a>
@@ -35,8 +41,10 @@
             </ul>
           <% end %>
 
+          <!-- User options -->
           <ul class="navbar-nav ml-auto">
             <% if user_signed_in? %>
+              <!-- User dropdown -->
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <%= current_user.name %>
@@ -51,7 +59,7 @@
                 </div>
               </li>
             <% else %>
-              <li <%= 'class=active' if current_page?(new_user_session_path) %>>
+              <li <%= 'class="active"' if current_page?(new_user_session_path) %>>
                 <%= link_to 'Log in', new_user_session_path, class: "nav-link" %>
               </li>
             <% end %>
@@ -59,11 +67,27 @@
         </div>
       </div>
     </nav>
+
     <div class="container">
-      <!-- Not sure about using these
-      <p class="notice"><%= notice %></p>
-      <p class="alert"><%= alert %></p>
-      -->
+      <!-- Controller messages -->
+      <%  if notice.present? %>
+        <div class="alert alert-info alert-dismissible fade show my-2" role="alert">
+          <%= notice %>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      <% end %>
+      <%  if alert.present? %>
+        <div class="alert alert-warning alert-dismissible fade show my-2" role="alert">
+          <%= alert %>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      <% end %>
+
+      <!-- Main content -->
       <div class="mt-2">
         <%= yield %>
       </div>

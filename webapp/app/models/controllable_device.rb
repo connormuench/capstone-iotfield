@@ -6,6 +6,7 @@ class ControllableDevice < ApplicationRecord
 
   after_initialize :init
 
+  # Initialize mode and status to default values
   def init
   	self.mode = "Manual"
   	self.status = "Off"
