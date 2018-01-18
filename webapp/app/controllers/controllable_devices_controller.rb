@@ -68,7 +68,7 @@ class ControllableDevicesController < ApplicationController
 
   # DELETE /facilities/1/controllable_devices/1
   def destroy
-    if @controllable_device.end_device.points == 1
+    if @controllable_device.end_device.points.length == 1
       @controllable_device.end_device.destroy
     end
 

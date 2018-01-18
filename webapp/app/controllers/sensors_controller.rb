@@ -56,7 +56,7 @@ class SensorsController < ApplicationController
 
   # DELETE /facilities/1/sensors/1
   def destroy
-    if @sensor.end_device.length == 1
+    if @sensor.end_device.points.length == 1
       @sensor.end_device.destroy
     end
     @sensor.destroy
