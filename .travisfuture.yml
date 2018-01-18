@@ -1,0 +1,22 @@
+matrix:
+  include:
+    - language: ruby
+
+      rvm:
+        - 2.3
+
+      env:
+        - RAILS_ENV=test
+
+      services:
+        - postgresql
+
+      before_script:
+        - cd webapp
+        - cp config/database.yml.travis config/database.yml
+        - bundle install
+        - bin/rails db:create
+        - bin/rails db:migrate
+
+      script:
+        - bin/rails t

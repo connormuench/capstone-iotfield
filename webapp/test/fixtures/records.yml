@@ -3,9 +3,7 @@
 one:
   value: 9.99
   unit: MyString
-  timestamp: 2017-12-19 19:55:30
 
 two:
   value: 9.99
   unit: MyString
-  timestamp: 2017-12-19 19:55:30
