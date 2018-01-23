@@ -1,0 +1,57 @@
+<div class="row mb-2 mt-5 mx-auto">
+  <div class="col-xs my-auto">
+    <h1>Facilities</h1>
+  </div>
+
+  <% if current_user.is_admin %>
+    <div class="col-xs ml-3 my-auto pb-2">
+      <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addFacilityModal"><%= ion_icon "plus" %></button>
+    </div>
+  <% end %>
+</div>
+
+<%= render partial: 'list_facilities', locals: { access_levels: current_user.access_levels } %>
+
+<!-- Add Facility Modal -->
+<div class="modal fade" id="addFacilityModal" tabindex="-1" role="dialog" aria-labelledby="addFacilityModalLLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addFacilityModalLLabel">Add Facility</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <%= form_for Facility.new, html: {id: 'addFacilityForm'} do |f| %>
+          <div class="form-group">
+            <%= f.label :name, class: 'required' %>
+            <%= f.text_field :name, class: 'form-control', placeholder: 'Name' %>
+          </div>
+          <div class="form-group">
+            <%= f.label :network_address, class: 'required' %>
+            <%= f.text_field :network_address, class: 'form-control', placeholder: 'Facility IP address' %>
+          </div>
+          <div class="form-group">
+            <%= f.label :network_port, class: 'required' %>
+            <%= f.text_field :network_port, class: 'form-control', placeholder: 'Facility port number' %>
+          </div>
+          <div class="form-group">
+            <%= f.label :location %>
+            <%= f.text_field :location, class: 'form-control', placeholder: 'Coordinates or address' %>
+          </div>
+          <div class="form-group">
+            <%= f.label :description %>
+            <%= f.text_area :description, class: 'form-control' %>
+          </div>
+        <% end %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-success" onclick="$('#addFacilityForm').submit()">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%= render 'add_point_modal' %>

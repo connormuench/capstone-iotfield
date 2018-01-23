@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  network_address: MyString
+  name: MyString
+  description: MyString
+  location: MyString
+  network_port: 1
+
+two:
+  network_address: MyString
+  name: MyString
+  description: MyString
+  location: MyString
+  network_port: 1

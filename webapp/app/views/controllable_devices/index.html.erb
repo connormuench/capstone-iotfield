@@ -1,0 +1,25 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Controllable Devices</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @controllable_devices.each do |controllable_device| %>
+      <tr>
+        <td><%= link_to 'Show', controllable_device %></td>
+        <td><%= link_to 'Edit', edit_controllable_device_path(controllable_device) %></td>
+        <td><%= link_to 'Destroy', controllable_device, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Controllable Device', new_controllable_device_path %>

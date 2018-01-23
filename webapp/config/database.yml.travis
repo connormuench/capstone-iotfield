@@ -1,0 +1,5 @@
+test:
+  adapter: postgresql
+  username: postgres
+  database: webapp_test
+  encoding: utf8

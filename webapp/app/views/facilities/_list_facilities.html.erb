@@ -1,0 +1,62 @@
+<% access_levels.each do |access_level| %>
+  <% facility = access_level.facility %>
+  <div class="card">
+    <div class="card-header" role="tab" id="heading<%= facility.id %>">
+      <div class="row mx-auto">
+        <div class="col-xs ml-0 my-auto">
+          <a data-toggle="collapse" href="#facility<%= facility.id %>" aria-expanded="true" aria-controls="facility<%= facility.id %>">
+            <h5 class="mb-0"><%= facility.name %></h5>
+          </a>
+        </div>
+        <div class="col-xs ml-2 my-auto">
+          <span class="ion-<%= ('wrench' if access_level.level == 'Controller') || 'eye' %>" title="You are a <%= access_level.level.downcase %> of this facility"></span>
+        </div>
+        <div class="col-xs ml-auto my-auto">
+          <div class="btn-group" role="group" aria-label="Manipulate facility">
+            <%= link_to ion_icon('information'), facility_path(facility), class: 'btn btn-primary btn-sm manip-button', title: 'View the facility' %>
+            <% if current_user.is_admin %>
+              <%= link_to ion_icon('trash-b'), facility_path(facility), method: :delete, class: 'btn btn-danger btn-sm manip-button', title: 'Delete the facility', data: { confirm: 'Are you sure?' } %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="facility<%= facility.id %>" class="collapse" role="tabpanel" aria-labelledby="heading<%= facility.id %>">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-lg-4 col-sm-6">
+            <b>Network address: </b><%= facility.network_address + ':' + facility.network_port.to_s %>
+          </div>
+          <% if facility.location.present? %>
+            <div class="col-lg-4 col-sm-6">
+              <b>Location: </b><%= facility.location %>
+            </div>
+          <% end %>
+        </div>
+        <% if facility.description.present? %>
+          <p class="mt-2">
+            <%= facility.description %>
+          </p>
+        <% end %>
+        <% if facility.points.any? %>
+          <div class="row">
+            <% facility.points.each do |point| %>
+              <div class="col-lg-4">
+                <b><%= link_to point.name, [facility, point.pointable], data: {toggle: 'popover', placement: 'bottom', content: point.description, container: 'body', trigger: 'hover'} %>: </b>
+                <%= (point.records.last.value.to_s + ' ' + point.records.last.unit if point.records.any?) || 'No data' %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+        <% if current_user.is_admin %>
+          <div class="row mx-auto">
+            <div class="col-xs ml-auto">
+              <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addPointModal" data-facility-id="<%= facility.id %>">Add Point</button>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

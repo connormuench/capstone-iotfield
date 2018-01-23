@@ -1,0 +1,82 @@
+<!-- Add Point Modal -->
+<div class="modal fade" id="addPointModal" tabindex="-1" role="dialog" aria-labelledby="addPointModalLLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addPointModalLLabel">Add Point</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="btn-group" data-toggle="buttons">
+          <label class="btn btn-primary active">
+            <input type="radio" name="pointTypes" id="sensorOption" autocomplete="off" checked> Sensor
+          </label>
+          <label class="btn btn-primary">
+            <input type="radio" name="pointTypes" id="controllableDeviceOption" autocomplete="off"> Controllable device
+          </label>
+        </div>
+        <%= form_for '', as: :post, html: {id: 'addPointForm', onsubmit: 'submitted()'} do |f| %>
+          <%= fields_for :point do |ff| %>
+            <div class="form-group">
+              <%= ff.label :name, class: 'required' %>
+              <%= ff.text_field :name, class: 'form-control', placeholder: 'Name' %>
+            </div>
+            <div class="form-group">
+              <%= f.label :address, class: 'required' %>
+              <%= f.text_field :address, class: 'form-control', placeholder: 'Address' %>
+            </div>
+            <div class="form-group">
+              <%= ff.label :remote_id, class: 'required' %>
+              <%= ff.text_field :remote_id, class: 'form-control', placeholder: 'Remote ID' %>
+            </div>
+            <div class="form-group">
+              <%= ff.label :location %>
+              <%= ff.text_field :location, class: 'form-control', placeholder: 'Coordinates or address' %>
+            </div>
+            <div class="form-group">
+              <%= ff.label :description %>
+              <%= ff.text_area :description, class: 'form-control' %>
+            </div>
+          <% end %>
+          <div id="controllableDeviceSection" style="display: none;">
+            <div class="row mx-auto">
+              <div class="col-xs my-auto">
+                <h5>Automation Rules</h5>
+              </div>
+              <div class="col-xs ml-3 my-auto pb-2">
+                <button type="button" class="btn btn-success btn-sm" onclick="addRuleRow()"><%= ion_icon "plus" %></button>
+              </div>
+            </div>
+            <% require "json" %>
+            <% available_points = {} %>
+            <% current_user.facilities.each do |facility| %>
+              <% facility.points.each do |point| %>
+                <% if not available_points.key?(facility.id) %>
+                  <% available_points[facility.id] = [] %>
+                <% end %>
+                <% available_points[facility.id].push('{' + point.name + '|' + point.end_device.address + ':' + point.remote_id.to_s + '}') %>
+              <% end %>
+            <% end %>
+            <table class="table table-bordered table-hover table-sm" id="rules-table" data-points="<%= available_points.to_json %>">
+              <thead>
+                <tr>
+                  <th scope="col">Active</th>
+                  <th scope="col">Expression</th>
+                  <th scope="col">Action</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody id="rule-rows">
+              </tbody>
+            </table>
+          </div>
+        <% end %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-success" onclick="$('#addPointForm').submit()">Add</button>
+    </div>
+  </div>
+</div>
