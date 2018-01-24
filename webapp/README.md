@@ -18,11 +18,11 @@ Install at least the versions of [Ruby](https://rubyinstaller.org/), [Rails](htt
 
 Navigate to the 'webapp' directory within the cloned repository in a terminal and run `bundle install`. The bundler should automatically install all of the required Gems for the application to work.
 
-__Note:__ On Windows, the `bcrypt` Gem is often installed incorrectly. Run `gem list bcrypt` and ensure that the x86-mingw32 version is not installed. If it is, run `gem remove bcrypt` to remove it and manually install the correct version using `gem install bcrypt --platform=ruby`.
+__Note:__ On Windows, the `bcrypt` Gem is often installed incorrectly. Run `gem list bcrypt` and ensure that the x86-mingw32 version is not installed. If it is, run `gem uninstall bcrypt` to remove it and manually install the correct version using `gem install bcrypt --platform=ruby`.
 
 ### Setting Up the Database
 
-The database needs to have a user that the web server can use to access it. Navigate to the `bin` directory within the Postgres installation directory and run `createuser -U postgres -P rails`. This command will prompt for the password for the `postgres` user, so enter whatever was set in the installation of Postgres. You will then be prompted for the password of the new user.
+The database needs to have a user that the web server can use to access it. Navigate to the `bin` directory within the Postgres installation directory and run `createuser -U postgres -P -s rails`. This command will prompt for the password for the `postgres` user, so enter whatever was set in the installation of Postgres. You will then be prompted for the password of the new user.
 
 Navigate back to the `webapp` directory of the cloned repository in a terminal. Set the `WEBAPP_DATABASE_PASSWORD` environment variable to the password for the `rails` user created in Postgres. In Unix, this is just `WEBAPP_DATABASE_PASSWORD=<password>`, and in Windows the command is `set WEBAPP_DATABASE_PASSWORD=<password>`. Run `rails db:create` afterwards to create the database, and then `rails db:migrate` to set up the tables in the database.
 
