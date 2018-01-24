@@ -18,7 +18,7 @@ Install at least the versions of [Ruby](https://rubyinstaller.org/), [Rails](htt
 
 Navigate to the 'webapp' directory within the cloned repository in a terminal and run `bundle install`. The bundler should automatically install all of the required Gems for the application to work.
 
-__Note:__ On Windows, the `bcrypt` Gem is often installed incorrectly. Run `gem list bcrypt` and ensure that the x86-mingw32 version is not installed. If it is, run `gem remove bcrypt` to remove it and manually install the correct version using `gem install bcrypt --platform=ruby`.
+__Note:__ On Windows, the `bcrypt` Gem is often installed incorrectly. Run `gem list bcrypt` and ensure that the x86-mingw32 version is not installed. If it is, run `gem uninstall bcrypt` to remove it and manually install the correct version using `gem install bcrypt --platform=ruby`.
 
 ### Setting Up the Database
 
