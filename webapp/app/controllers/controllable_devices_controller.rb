@@ -2,6 +2,7 @@ class ControllableDevicesController < ApplicationController
   require 'pi_lists'
 
   before_action :set_controllable_device, only: [:show, :update, :destroy]
+  before_action only: [:create, :update, :destroy] { check_admin(facility_url(Facility.find(params[:facility_id]))) }
 
   # GET /facilities/1/controllable_devices/1
   def show
@@ -57,6 +58,7 @@ class ControllableDevicesController < ApplicationController
         end
       end
 
+      # Ensure the corresponding facility is connected before sending the 'add-point' command
       if PiLists.instance.accepted.key?(facility.pi_id)
         PiLists.instance.accepted[facility.pi_id][:ws].send({action: 'add-point', type: 'controllable_device', id: params[:remote_id]}.to_json)
       end
@@ -77,12 +79,14 @@ class ControllableDevicesController < ApplicationController
 
   # DELETE /facilities/1/controllable_devices/1
   def destroy
+    # Remove the associated end device if this point is its only associated point
     if @controllable_device.point.end_device.points.length == 1
       @controllable_device.point.end_device.destroy
     end
 
     facility = Facility.find(params[:facility_id])
 
+    # Ensure the corresponding facility is connected before sending the 'remove-point' command
     if PiLists.instance.accepted.key?(facility.pi_id)
       remote_id = @controllable_device.point.end_device.address + ':' + @controllable_device.point.remote_id.to_s
       PiLists.instance.accepted[facility.pi_id][:ws].send({action: 'remove-point', type: 'controllable_device', id: remote_id}.to_json)

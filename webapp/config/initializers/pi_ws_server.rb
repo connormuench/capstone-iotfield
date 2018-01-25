@@ -54,17 +54,22 @@ Thread.new {
       # Callback to run whenever a new message is received
       ws.onmessage { |msg|
         jsonified_msg = JSON.parse(msg)
-        puts msg
+
         if jsonified_msg.key?('action')
+
+          # ACTION: available-points
           if jsonified_msg['action'] == 'available-points'
+            # Add the points to the points map for the controller to retrieve
             pi_lists.points[jsonified_msg['request_id']] = jsonified_msg['points']
+
+          # ACTION: record
           elsif jsonified_msg['action'] == 'record'
+            # Identify the specified end device and point
             end_device = EndDevice.where(address: jsonified_msg['address']).first
             if !end_device.nil?
-              puts 'End device found'
               point = end_device.points.find { |point| point.remote_id == jsonified_msg['remote_id'] }
               if !point.nil?
-                puts 'Point found'
+                # Add the record to the point's list of records
                 record = point.records.new(value: jsonified_msg['value'], unit: jsonified_msg['unit'])
                 record.save
               end

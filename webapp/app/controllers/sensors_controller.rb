@@ -1,5 +1,8 @@
 class SensorsController < ApplicationController
+  require 'pi_lists'
+  
   before_action :set_sensor, only: [:show, :update, :destroy]
+  before_action only: [:create, :update, :destroy] { check_admin(facility_url(Facility.find(params[:facility_id]))) }
 
   # GET /facilities/1/sensors/1
   def show
@@ -40,6 +43,7 @@ class SensorsController < ApplicationController
       point.pointable = @sensor
 
       if point.save
+        # Ensure the corresponding facility is connected before sending the 'add-point' command
         if PiLists.instance.accepted.key?(facility.pi_id)
           PiLists.instance.accepted[facility.pi_id][:ws].send({action: 'add-point', type: 'sensor', id: params[:remote_id]}.to_json)
         end
@@ -62,12 +66,14 @@ class SensorsController < ApplicationController
 
   # DELETE /facilities/1/sensors/1
   def destroy
+    # Remove the associated end device if this point is its only associated point
     if @sensor.point.end_device.points.length == 1
       @sensor.point.end_device.destroy
     end
 
     facility = Facility.find(params[:facility_id])
 
+    # Ensure the corresponding facility is connected before sending the 'remove-point' command
     if PiLists.instance.accepted.key?(facility.pi_id)
       remote_id = @sensor.point.end_device.address + ':' + @sensor.point.remote_id.to_s
       PiLists.instance.accepted[facility.pi_id][:ws].send({action: 'remove-point', type: 'sensor', id: remote_id}.to_json)

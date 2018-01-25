@@ -104,7 +104,7 @@ def handle_rx_packet(packet):
         return
     
     # Point is sending data intended for the server, so cache the value, pass it on and check if there are any rules set on the sensor value
-    last_reading[long_address] = re.search('[^:]*(\d+)\s*.*', packet['rf_data']).group(0)
+    last_reading[long_address] = re.search('[^:]*:(\d+)\s*.*', packet['rf_data']).group(0)
     send_to_server(packet['rf_data'])
     enforce_rules(long_address)
     

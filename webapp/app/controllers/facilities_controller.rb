@@ -59,6 +59,8 @@ class FacilitiesController < ApplicationController
   def destroy
     pi_id = @facility.pi_id
     @facility.destroy
+
+    # Move the Pi to the accepted map if it's connected
     if PiLists.instance.accepted.key?(pi_id)
       PiLists.instance.not_accepted[pi_id] = PiLists.instance.accepted[pi_id]
       PiLists.instance.accepted.delete(pi_id)
@@ -70,6 +72,7 @@ class FacilitiesController < ApplicationController
   # GET /facilities/addable
   def addable_facilities
     addable_facilities_list = []
+    # Populate the list with the currently connected Pis
     PiLists.instance.not_accepted.each_pair do |k, v|
       pi_hash = {id: k}
       pi_hash['name'] = v[:hs].headers_downcased['name'] if v[:hs].headers_downcased.key?('name')
@@ -83,11 +86,12 @@ class FacilitiesController < ApplicationController
     request_id = SecureRandom.hex(8)
     pi_lists = PiLists.instance
     pi_lists.accepted[@facility.pi_id][:ws].send({action: 'request-points', request_id: request_id}.to_json)
+
+    # Wait for response from the Pi
     while !pi_lists.points.key?(request_id)
       sleep(0.01)
     end
     points = pi_lists.points[request_id]
-    puts points
     pi_lists.points.delete(request_id)
     render json: points
   end
