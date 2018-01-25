@@ -5,5 +5,4 @@ class Facility < ApplicationRecord
 
   validates_presence_of :network_address
   validates_presence_of :name
-  validates_presence_of :network_port
 end

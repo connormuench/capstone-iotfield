@@ -19,6 +19,10 @@ $(document).ready(function() {
     $("input:radio[name=pointTypes]").on("change", function() {
         $("#addPointForm").attr("action", $(this).data("url"));
         $("#controllableDeviceSection").slideToggle();
+        $("#availableSensorsSection").toggle();
+        $("#availableControllableDevicesSection").toggle();
+        toggleDisabled($("#availableSensors"));
+        toggleDisabled($("#availableControllableDevices"));
     });
 
     // Event fired when #addPointModal is shown
@@ -37,6 +41,58 @@ $(document).ready(function() {
             // Reset the automation rule rows
             $("#rule-rows").children().remove();
         }
+        $.get("/facilities/" + facId + "/addable",
+            function(data) {
+                console.log(data);
+                var sensorSelect = $("#availableSensors");
+                var controllableDeviceSelect = $("#availableControllableDevices");
+                sensorSelect.children().remove();
+                controllableDeviceSelect.children().remove();
+                if ("sensor" in data) {
+                    data.sensor.forEach(function(element) {
+                        var text = element.id.toString();
+                        if ("name" in element) {
+                            text += " | " + element.name
+                        }
+                        sensorSelect.append($("<option>", {
+                            value: element.id,
+                            text: text
+                        }));
+                    });
+                }
+                if ("controllable_device" in data) {
+                    data.controllable_device.forEach(function(element) {
+                        var text = element.id.toString();
+                        if ("name" in element) {
+                            text += " | " + element.name
+                        }
+                        controllableDeviceSelect.append($("<option>", {
+                            value: element.id,
+                            text: text
+                        }));
+                    });
+                }
+            });
+    });
+
+    $("#addFacilityModal").on("show.bs.modal", function (event) {
+        $.get("/facilities/addable",
+            function(data) {
+                var select = $("#availablePis");
+                select.children().remove();
+                if ("facilities" in data) {
+                    data.facilities.forEach(function(element) {
+                        var text = element.id.toString();
+                        if ("name" in element) {
+                            text += " | " + element.name;
+                        }
+                        select.append($("<option>", {
+                            value: element.id,
+                            text: text
+                        }));
+                    });
+                }
+            });
     });
 
     // Initialize popovers
@@ -176,4 +232,24 @@ function editFacility() {
 function discardChanges() {
     $('#editFacilityForm').trigger("reset");
     $(".form-toggle").toggle();   
+}
+
+function toggleDisabled(element) {
+    if (element.is("[disabled]")) {
+        element.removeAttr("disabled");
+    } else {
+        element.attr("disabled", "true");
+    }
+}
+
+function disableElement(element) {
+    if (!element.is("[disabled]")) {
+        element.attr("disabled", "true");
+    }
+}
+
+function enableElement(element) {
+    if (element.is("[disabled]")) {
+        element.removeAttr("disabled");
+    }
 }

@@ -10,7 +10,9 @@ class SensorsController < ApplicationController
     @sensor = Sensor.new
     facility = Facility.find(params[:facility_id])
 
-    address = params[:address]
+    id_split = params[:remote_id].split(':')
+    address = id_split[0]
+    remote_id = id_split[1]
     end_devices = facility.end_devices
     found_end_device = nil
 
@@ -34,9 +36,11 @@ class SensorsController < ApplicationController
 
       # Create a new point under the end device and assign the sensor to it
       point = found_end_device.points.new(point_params)
+      point.remote_id = remote_id
       point.pointable = @sensor
 
       if point.save
+          PiLists.instance.accepted[facility.pi_id][:ws].send({action: 'add-point', type: 'sensor', id: params[:remote_id]}.to_json)
           redirect_to [facility, @sensor], notice: 'Sensor was successfully created.'
       else
         render :new
@@ -56,11 +60,16 @@ class SensorsController < ApplicationController
 
   # DELETE /facilities/1/sensors/1
   def destroy
-    if @sensor.end_device.points.length == 1
-      @sensor.end_device.destroy
+    if @sensor.point.end_device.points.length == 1
+      @sensor.point.end_device.destroy
     end
+
+    facility = Facility.find(params[:facility_id])
+    remote_id = @sensor.point.end_device.address + ':' + @sensor.point.remote_id.to_s
+    PiLists.instance.accepted[facility.pi_id][:ws].send({action: 'remove-point', type: 'sensor', id: remote_id}.to_json)
+
     @sensor.destroy
-    redirect_to sensors_url, notice: 'Sensor was successfully destroyed.'
+    redirect_to facility_url(facility), notice: 'Sensor was successfully destroyed.'
   end
 
   private
@@ -70,6 +79,6 @@ class SensorsController < ApplicationController
     end
 
     def point_params
-      params.require(:point).permit(:name, :remote_id, :description, :location)
+      params.require(:point).permit(:name, :description, :location)
     end
 end
