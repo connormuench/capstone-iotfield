@@ -1,5 +1,5 @@
 from ws4py.client.threadedclient import WebSocketClient
-import json, threading
+import json, threading, random, time
 
 points_waiting = {
     'sensor': [{'id': '12345678:0', 'name': 'Temperature sensor'}, {'id': '12345678:1', 'name': 'Water level sensor'}, {'id': '87654321:0', 'name': 'Water level sensor'}],
@@ -72,7 +72,13 @@ class PiClient(WebSocketClient):
         handle_message(str(m), self)
         print(m)
 
+def sendData(ws):
+    if 'sensor' in points_joined:
+        for sensor in points_joined['sensor']:
+            ws.send(json.dumps({'action': 'record', 'address': sensor['id'].split(':')[0], 'remote_id': int(sensor['id'].split(':')[1]), 'value': random.randint(20, 25), 'unit': 'degC'}))
+
 if __name__ == '__main__':
+    random.seed()
     try:
         ws = PiClient('ws://127.0.0.1:3002', headers=[('name', 'Moon Facility'), ('password', 'popeye'), ('id', '0112c6ea56b26df4')])
         #ws = PiClient('ws://127.0.0.1:3002', headers=[('name', 'Moon Facility'), ('password', 'popeye')])
@@ -81,6 +87,8 @@ if __name__ == '__main__':
         t.start()
         while t.isAlive():
             t.join(1)
+            time.sleep(2)
+            sendData(ws)
     except KeyboardInterrupt:
         ws.close()
         t.join()

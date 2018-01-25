@@ -61,8 +61,10 @@ Thread.new {
           elsif jsonified_msg['action'] == 'record'
             end_device = EndDevice.where(address: jsonified_msg['address']).first
             if !end_device.nil?
+              puts 'End device found'
               point = end_device.points.find { |point| point.remote_id == jsonified_msg['remote_id'] }
               if !point.nil?
+                puts 'Point found'
                 record = point.records.new(value: jsonified_msg['value'], unit: jsonified_msg['unit'])
                 record.save
               end

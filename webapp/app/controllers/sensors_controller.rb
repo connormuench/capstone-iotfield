@@ -40,8 +40,10 @@ class SensorsController < ApplicationController
       point.pointable = @sensor
 
       if point.save
+        if PiLists.instance.accepted.key?(facility.pi_id)
           PiLists.instance.accepted[facility.pi_id][:ws].send({action: 'add-point', type: 'sensor', id: params[:remote_id]}.to_json)
-          redirect_to [facility, @sensor], notice: 'Sensor was successfully created.'
+        end
+        redirect_to [facility, @sensor], notice: 'Sensor was successfully created.'
       else
         render :new
         raise ActiveRecord::Rollback
@@ -65,8 +67,11 @@ class SensorsController < ApplicationController
     end
 
     facility = Facility.find(params[:facility_id])
-    remote_id = @sensor.point.end_device.address + ':' + @sensor.point.remote_id.to_s
-    PiLists.instance.accepted[facility.pi_id][:ws].send({action: 'remove-point', type: 'sensor', id: remote_id}.to_json)
+
+    if PiLists.instance.accepted.key?(facility.pi_id)
+      remote_id = @sensor.point.end_device.address + ':' + @sensor.point.remote_id.to_s
+      PiLists.instance.accepted[facility.pi_id][:ws].send({action: 'remove-point', type: 'sensor', id: remote_id}.to_json)
+    end
 
     @sensor.destroy
     redirect_to facility_url(facility), notice: 'Sensor was successfully destroyed.'

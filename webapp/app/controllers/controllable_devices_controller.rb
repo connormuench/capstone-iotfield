@@ -57,7 +57,9 @@ class ControllableDevicesController < ApplicationController
         end
       end
 
-      PiLists.instance.accepted[facility.pi_id][:ws].send({action: 'add-point', type: 'controllable_device', id: params[:remote_id]}.to_json)
+      if PiLists.instance.accepted.key?(facility.pi_id)
+        PiLists.instance.accepted[facility.pi_id][:ws].send({action: 'add-point', type: 'controllable_device', id: params[:remote_id]}.to_json)
+      end
 
       # No failures if we got to this point, show the controllable device's page
       redirect_to [facility, @controllable_device], notice: 'Controllable device was successfully created.'
@@ -80,8 +82,11 @@ class ControllableDevicesController < ApplicationController
     end
 
     facility = Facility.find(params[:facility_id])
-    remote_id = @controllable_device.point.end_device.address + ':' + @controllable_device.point.remote_id.to_s
-    PiLists.instance.accepted[facility.pi_id][:ws].send({action: 'remove-point', type: 'controllable_device', id: remote_id}.to_json)
+
+    if PiLists.instance.accepted.key?(facility.pi_id)
+      remote_id = @controllable_device.point.end_device.address + ':' + @controllable_device.point.remote_id.to_s
+      PiLists.instance.accepted[facility.pi_id][:ws].send({action: 'remove-point', type: 'controllable_device', id: remote_id}.to_json)
+    end
 
     @controllable_device.destroy
     redirect_to facility_url(facility), notice: 'Controllable device was successfully destroyed.'
