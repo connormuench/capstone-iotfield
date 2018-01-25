@@ -105,3 +105,15 @@ function hideSearchDropdown() {
         dropdown.removeClass("show").find(".dropdown-menu").removeClass("show");
     }
 }
+
+
+// Function to reset the form and toggle the form fields to read-only attributes
+function discardChanges(form) {
+    form.trigger("reset");
+    $(".form-toggle").toggle();   
+}
+
+// Function to toggle the attributes to become editable form fields
+function editAttributes() {
+    $(".form-toggle").toggle();
+}

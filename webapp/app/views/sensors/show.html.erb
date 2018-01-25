@@ -1,25 +1,23 @@
-<%= form_for @facility, method: :patch, html: {id: 'editFacilityForm'} do |f| %>
+<%= form_for [@sensor.point.end_device.facility, @sensor], method: :patch, html: {id: 'editSensorForm'} do |f| %>
   <div class="row mt-5 mx-auto">
     <div class="col-xs my-auto">
       <h1>
-        <span class="form-toggle"><%= @facility.name %></span>
-        <%= f.text_field :name, class: 'form-toggle', value: @facility.name, style: 'display: none;' %>
-        <span class="ion-<%= ('wrench' if @access_level.level == 'Controller') || 'eye' %> mr-3" title="You are a <%= @access_level.level.downcase %> of this facility"></span>
+        <span class="form-toggle"><%= @sensor.point.name %></span>
+        <%= f.text_field :name, class: 'form-toggle', value: @sensor.point.name, style: 'display: none;' %>
       </h1>
     </div>
 
     <% if current_user.is_admin %>
       <div class="col-xs my-auto">
         <!-- Form submission button group -->
-        <div class="btn-group form-toggle" role="group" aria-label="Manipulate facility" style="display: none;">
-          <a href="javascript:void(0)" class="btn btn-success" title="Save changes" onclick="$('#editFacilityForm').submit()"><%= ion_icon('checkmark') %></a>
-          <a href="javascript:void(0)" class="btn btn-danger" title="Discard changes" onclick="discardChanges()"><%= ion_icon('close') %></a>
+        <div class="btn-group form-toggle" role="group" aria-label="Manipulate sensor" style="display: none;">
+          <a href="javascript:void(0)" class="btn btn-success" title="Save changes" onclick="$('#editSensorForm').submit()"><%= ion_icon('checkmark') %></a>
+          <a href="javascript:void(0)" class="btn btn-danger" title="Discard changes" onclick="discardChanges($('#editSensorForm'))"><%= ion_icon('close') %></a>
         </div>
         <!-- Facility manipulation button group -->
         <div class="btn-group form-toggle" role="group" aria-label="Manipulate facility">
-          <a href="javascript:void(0)" class="btn btn-success" data-toggle="modal" data-target="#addPointModal" data-facility-id="<%= @facility.id %>" title="Add a new point"><%= ion_icon('plus') %></a>
-          <%= link_to ion_icon('edit'), 'javascript:void(0)', class: 'btn btn-info facility-manip', title: 'Edit the facility', onclick: 'editFacility()' %>
-          <%= link_to ion_icon('trash-b'), facility_path(@facility), method: :delete, class: 'btn btn-danger facility-manip', title: 'Delete the facility', data: { confirm: 'Are you sure?' } %>
+          <%= link_to ion_icon('edit'), 'javascript:void(0)', class: 'btn btn-info facility-manip', title: 'Edit the sensor', onclick: 'editAttributes()' %>
+          <%= link_to ion_icon('trash-b'), facility_sensor_path(@sensor,), method: :delete, class: 'btn btn-danger facility-manip', title: 'Delete the facility', data: { confirm: 'Are you sure?' } %>
         </div>
       </div>
     <% end %>
@@ -30,7 +28,7 @@
       <b>Network address</b>
     </div>
     <div class="col-sm-10">
-      <%= @facility.network_address + ':' + @facility.network_port.to_s %>
+      <%= @sensor.network_address + ':' + @sensor.network_port.to_s %>
     </div>
   </div>
   <div class="row my-2">
@@ -38,8 +36,8 @@
       <b><%= f.label :location, class: 'my-auto' %></b>
     </div>
     <div class="col-sm-10">
-      <span class="form-toggle"><%= @facility.location %></span>
-      <%= f.text_field :location, class: 'form-control form-toggle', placeholder: 'Coordinates or address', value: @facility.location, style: 'display:none;' %>
+      <span class="form-toggle"><%= @sensor.location %></span>
+      <%= f.text_field :location, class: 'form-control form-toggle', placeholder: 'Coordinates or address', value: @sensor.location, style: 'display:none;' %>
     </div>
   </div>
   <div class="row my-2">
@@ -47,8 +45,8 @@
       <b><%= f.label :description, class: 'my-auto' %></b>
     </div>
     <div class="col-sm-10">
-      <span class="form-toggle"><%= @facility.description %></span>
-      <%= f.text_area :description, class: 'form-control form-toggle', value: @facility.description, style: 'display:none;' %>
+      <span class="form-toggle"><%= @sensor.description %></span>
+      <%= f.text_area :description, class: 'form-control form-toggle', value: @sensor.description, style: 'display:none;' %>
     </div>
   </div>
 <% end %>

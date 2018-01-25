@@ -50,7 +50,7 @@ end
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'devise'
-gem 'bcrypt', '~> 3.1.11', 'platforms::ruby'
+gem 'bcrypt', '~> 3.1.11', platforms: :ruby
 
 gem 'bootstrap'
 gem 'jquery-rails'

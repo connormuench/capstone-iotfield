@@ -167,13 +167,5 @@ function sensorClicked(element) {
     return false;
 }
 
-// Function to toggle the facility's attributes to become editable form fields
-function editFacility() {
-    $(".form-toggle").toggle();
-}
 
-// Function to reset the facility's form and toggle the form fields to read-only attributes
-function discardChanges() {
-    $('#editFacilityForm').trigger("reset");
-    $(".form-toggle").toggle();   
-}
+
