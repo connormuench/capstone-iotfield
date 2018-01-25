@@ -26,7 +26,7 @@
       <div class="card-body">
         <div class="row">
           <div class="col-lg-4 col-sm-6">
-            <b>Network address: </b><%= facility.network_address + ':' + facility.network_port.to_s %>
+            <b>Network address: </b><%= facility.network_address %>
           </div>
           <% if facility.location.present? %>
             <div class="col-lg-4 col-sm-6">

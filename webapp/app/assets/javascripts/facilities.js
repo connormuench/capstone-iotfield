@@ -19,6 +19,10 @@ $(document).ready(function() {
     $("input:radio[name=pointTypes]").on("change", function() {
         $("#addPointForm").attr("action", $(this).data("url"));
         $("#controllableDeviceSection").slideToggle();
+        $("#availableSensorsSection").toggle();
+        $("#availableControllableDevicesSection").toggle();
+        toggleDisabled($("#availableSensors"));
+        toggleDisabled($("#availableControllableDevices"));
     });
 
     // Event fired when #addPointModal is shown
@@ -37,6 +41,68 @@ $(document).ready(function() {
             // Reset the automation rule rows
             $("#rule-rows").children().remove();
         }
+
+        // Retrieve the points that are addable for the current facility
+        $.get("/facilities/" + facId + "/addable",
+            function(data) {
+                // Clear the select options before adding the current options
+                var sensorSelect = $("#availableSensors");
+                var controllableDeviceSelect = $("#availableControllableDevices");
+                sensorSelect.children().remove();
+                controllableDeviceSelect.children().remove();
+
+                // Add the returned sensors to the sensor select
+                if ("sensor" in data) {
+                    data.sensor.forEach(function(element) {
+                        var text = element.id.toString();
+                        if ("name" in element) {
+                            text += " | " + element.name
+                        }
+                        sensorSelect.append($("<option>", {
+                            value: element.id,
+                            text: text
+                        }));
+                    });
+                }
+
+                // Add the returned controllable devices to the controllable device select
+                if ("controllable_device" in data) {
+                    data.controllable_device.forEach(function(element) {
+                        var text = element.id.toString();
+                        if ("name" in element) {
+                            text += " | " + element.name
+                        }
+                        controllableDeviceSelect.append($("<option>", {
+                            value: element.id,
+                            text: text
+                        }));
+                    });
+                }
+            });
+    });
+
+    // Event fired when #addFacilityModal is shown
+    $("#addFacilityModal").on("show.bs.modal", function (event) {
+        // Retrieve the available facilities from the web server
+        $.get("/facilities/addable",
+            function(data) {
+                // Clear the select options before adding the current options
+                var select = $("#availablePis");
+                select.children().remove();
+                // Add the returned facilities to the facility select
+                if ("facilities" in data) {
+                    data.facilities.forEach(function(element) {
+                        var text = element.id.toString();
+                        if ("name" in element) {
+                            text += " | " + element.name;
+                        }
+                        select.append($("<option>", {
+                            value: element.id,
+                            text: text
+                        }));
+                    });
+                }
+            });
     });
 
     // Initialize popovers
@@ -176,4 +242,27 @@ function editFacility() {
 function discardChanges() {
     $('#editFacilityForm').trigger("reset");
     $(".form-toggle").toggle();   
+}
+
+// Function to toggle the disabled state of the specified JQuery element
+function toggleDisabled(element) {
+    if (element.is("[disabled]")) {
+        element.removeAttr("disabled");
+    } else {
+        element.attr("disabled", "true");
+    }
+}
+
+// Function to disable the specified JQuery element
+function disableElement(element) {
+    if (!element.is("[disabled]")) {
+        element.attr("disabled", "true");
+    }
+}
+
+// Function to enable the specified JQuery element
+function enableElement(element) {
+    if (element.is("[disabled]")) {
+        element.removeAttr("disabled");
+    }
 }

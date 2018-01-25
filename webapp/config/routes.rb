@@ -3,6 +3,9 @@ Rails.application.routes.draw do
   root to: 'facilities#index'
   get '/search', to: 'main#search', as: 'search'
 
+  get '/facilities/addable', to: 'facilities#addable_facilities'
+  get '/facilities/:id/addable', to: 'facilities#addable_points'
+
   resources :users
 
   resources :facilities do
