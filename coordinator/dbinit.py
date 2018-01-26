@@ -22,7 +22,7 @@ TABLE points
 
 long_address: the serial number of the XBee associated with the point
 """
-cur.execute("CREATE TABLE points(long_address TEXT UNIQUE);")
+cur.execute("CREATE TABLE points(point_id TEXT UNIQUE);")
 
 """
 TABLE rules

@@ -25,7 +25,10 @@ class DatabaseManager():
         """
         
         self.__cur.execute('SELECT *, rowid FROM points;')
-        return map(lambda k: Point(**k), self.__cur.fetchall())
+        temp_dic = {}
+        for record in self.__cur.fetchall():
+            temp_dic[record['point_id']] = None
+        return temp_dic
         
         
     def get_point(self, long_address):

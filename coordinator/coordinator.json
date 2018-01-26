@@ -5,5 +5,8 @@
     "xbee-port": "/dev/ttyAMA0",
     "xbee-baudrate": 115200,
     "xbee-reset-rpi-bcm-pin": 4,
-    "xbee-cts-rpi-bcm-pin": 16
+    "xbee-cts-rpi-bcm-pin": 16,
+    "name": "Moon Facility",
+    "webserver_password": "popeye"
+	
 }
