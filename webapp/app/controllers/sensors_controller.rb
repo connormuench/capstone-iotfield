@@ -2,12 +2,20 @@ class SensorsController < ApplicationController
   require 'pi_lists'
   
   before_action :set_sensor, only: [:show, :update, :destroy]
-  before_action :set_facility, only: [:show, :create, :destroy]
+  before_action :set_facility, only: [:show, :create, :update, :destroy]
   before_action :authenticate_user!
   before_action only: [:create, :update, :destroy] { check_admin(facility_url(Facility.find(params[:facility_id]))) }
 
   # GET /facilities/1/sensors/1
   def show
+    records = @sensor.point.records
+    @data = {}
+    records.each do |record|
+      @data[record.created_at] = record.value
+    end
+    if records.count > 0
+      @unit=@sensor.point.records.first.unit
+    end
   end
 
   # POST /facilities/1/sensors
@@ -58,8 +66,8 @@ class SensorsController < ApplicationController
 
   # PATCH/PUT /facilities/1/sensors/1
   def update
-    if @sensor.update(sensor_params)
-      redirect_to @sensor, notice: 'Sensor was successfully updated.'
+    if @sensor.point.update(point_params)
+      redirect_to [@facility, @sensor], notice: 'Sensor was successfully updated.'
     else
       render :edit
     end
@@ -89,7 +97,7 @@ class SensorsController < ApplicationController
     end
 
     def set_facility
-      @facility = Facility.find(params[:facilities_id])
+      @facility = Facility.find(params[:facility_id])
     end
 
     def point_params

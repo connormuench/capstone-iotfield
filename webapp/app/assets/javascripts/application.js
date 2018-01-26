@@ -17,6 +17,8 @@
 //= require popper
 //= require bootstrap-sprockets
 
+//= require chartkick
+
 // Function to populate the sitewide search box dropdown
 function autocompleteSearch(textbox) {
     var jTextbox = $(textbox);

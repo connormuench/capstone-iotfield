@@ -59,4 +59,6 @@ gem 'font-ionicons-rails'
 
 gem 'em-websocket'
 
+gem 'chartkick'
+
 gem 'concurrent-ruby', require: 'concurrent'

@@ -1,4 +1,30 @@
-<p id="notice"><%= notice %></p>
+<%= form_for [@facility, @controllable_device], method: :patch, html: {id: 'editSensorForm'} do |f| %>
+  <%= render partial: 'points/show.html.erb', locals: { point: @controllable_device.point, point_type: "controllable device", path: facility_controllable_device_path(@controllable_device, @facility.id) } %>
+<% end %>
 
-<%= link_to 'Edit', edit_controllable_device_path(@controllable_device) %> |
-<%= link_to 'Back', controllable_devices_path %>
+<div class="row my-2">
+<div class="col-sm-2">
+  <b class="my-auto">Status</b>
+</div>
+<div class="col-sm-10">
+  <span> <%= @controllable_device.status %> </span>
+</div>
+</div>
+
+<div class="row my-2">
+<div class="col-sm-2">
+  <b class="my-auto">Mode</b>
+</div>
+<div class="col-sm-10">
+  <span> <%= @controllable_device.mode %> </span>
+</div>
+</div>
+
+<div class="btn-group mt-2" data-toggle="buttons">
+    <label class="btn btn-primary active">
+       <input type="radio" name="pointTypes" id="sensorOption" autocomplete="off" checked> MANUAL
+   </label>
+          <label class="btn btn-primary">
+            <input type="radio" name="pointTypes" id="controllableDeviceOption" autocomplete="off"> AUTO
+          </label>
+        </div>
