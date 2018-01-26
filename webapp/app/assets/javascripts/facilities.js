@@ -42,13 +42,13 @@ $(document).ready(function() {
 
                 // Add the returned sensors to the sensor select
                 if ("sensor" in data) {
-                    data.sensor.forEach(function(element) {
-                        var text = element.id.toString();
-                        if ("name" in element) {
-                            text += " | " + element.name
+                    Object.keys(data.sensor).forEach(function(key) {
+                        var text = key.toString();
+                        if (data.sensor[key] !== "") {
+                            text += " | " + data.sensor[key];
                         }
                         sensorSelect.append($("<option>", {
-                            value: element.id,
+                            value: key,
                             text: text
                         }));
                     });
@@ -56,13 +56,13 @@ $(document).ready(function() {
 
                 // Add the returned controllable devices to the controllable device select
                 if ("controllable_device" in data) {
-                    data.controllable_device.forEach(function(element) {
-                        var text = element.id.toString();
-                        if ("name" in element) {
-                            text += " | " + element.name
+                    Object.keys(data.controllable_device).forEach(function(key) {
+                        var text = key.toString();
+                        if (data.controllable_device[key] !== "") {
+                            text += " | " + data.controllable_device[key];
                         }
                         controllableDeviceSelect.append($("<option>", {
-                            value: element.id,
+                            value: key,
                             text: text
                         }));
                     });
