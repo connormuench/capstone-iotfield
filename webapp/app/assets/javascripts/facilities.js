@@ -50,7 +50,6 @@ $(document).ready(function() {
                 var controllableDeviceSelect = $("#availableControllableDevices");
                 sensorSelect.children().remove();
                 controllableDeviceSelect.children().remove();
-                console.log(data);
 
                 // Add the returned sensors to the sensor select
                 if ("sensor" in data) {
