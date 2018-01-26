@@ -2,8 +2,8 @@ from ws4py.client.threadedclient import WebSocketClient
 import json, threading, random, time
 
 points_waiting = {
-    'sensor': [{'id': '12345678:0', 'name': 'Temperature sensor'}, {'id': '12345678:1', 'name': 'Water level sensor'}, {'id': '87654321:0', 'name': 'Water level sensor'}],
-    'controllable_device': [{'id': '87654321:1', 'name': 'Water pump'}, {'id': '12345679:0', 'name': 'Water valve'}]  
+    'sensor': {'12345678:0': 'Temperature sensor', '12345678:1': 'Water level sensor', '87654321:0': 'Water level sensor'},
+    'controllable_device': {'87654321:1': 'Water pump', '12345679:0': 'Water valve'}
 }
 
 points_joined = {}
@@ -32,27 +32,27 @@ def handle_message(msg, ws):
             point_type = str(params['type'])
             found_point = None
             for point in points_waiting[point_type]:
-                if point['id'] == key:
-                    found_point = point
-                    points_waiting[point_type].remove(point)
+                if point == key:
+                    found_point = points_waiting[point_type][point]
+                    del points_waiting[point_type][point]
                     break
             if found_point:
                 if not point_type in points_joined:
-                    points_joined[point_type] = []
-                points_joined[point_type].append(found_point)
+                    points_joined[point_type] = {}
+                points_joined[point_type][key] = found_point
         if params['action'] == 'remove-point':
             key = str(params['id'])
             point_type = str(params['type'])
             found_point = None
             for point in points_joined[point_type]:
-                if point['id'] == key:
-                    found_point = point
-                    points_joined[point_type].remove(point)
+                if point == key:
+                    found_point = points_joined[point_type][point]
+                    del points_joined[point_type][point]
                     break
             if found_point:
                 if not point_type in points_joined:
-                    points_waiting[point_type] = []
-                points_waiting[point_type].append(found_point)
+                    points_waiting[point_type] = {}
+                points_waiting[point_type][key] = found_point
 
 
 class PiClient(WebSocketClient):
