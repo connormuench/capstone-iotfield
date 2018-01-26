@@ -23,13 +23,13 @@
               <%= ff.label :name, class: 'required' %>
               <%= ff.text_field :name, class: 'form-control', placeholder: 'Name' %>
             </div>
-            <div class="form-group">
-              <%= f.label :address, class: 'required' %>
-              <%= f.text_field :address, class: 'form-control', placeholder: 'Address' %>
+            <div class="form-group" id="availableSensorsSection">
+              <%= f.label 'Available sensors', class: 'required' %>
+              <%= f.select :remote_id, [], {}, class: 'form-control', id: 'availableSensors' %>
             </div>
-            <div class="form-group">
-              <%= ff.label :remote_id, class: 'required' %>
-              <%= ff.text_field :remote_id, class: 'form-control', placeholder: 'Remote ID' %>
+            <div class="form-group" id="availableControllableDevicesSection" style="display: none;">
+              <%= f.label 'Available controllable devices', class: 'required' %>
+              <%= f.select :remote_id, [], {}, class: 'form-control', id: 'availableControllableDevices', disabled: true %>
             </div>
             <div class="form-group">
               <%= ff.label :location %>

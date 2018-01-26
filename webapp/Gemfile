@@ -56,3 +56,7 @@ gem 'bootstrap'
 gem 'jquery-rails'
 
 gem 'font-ionicons-rails'
+
+gem 'em-websocket'
+
+gem 'concurrent-ruby', require: 'concurrent'

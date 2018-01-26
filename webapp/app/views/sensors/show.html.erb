@@ -1,4 +1,4 @@
-<%= form_for [@sensor.point.end_device.facility, @sensor], method: :patch, html: {id: 'editSensorForm'} do |f| %>
+<%= form_for [@facility, @sensor], method: :patch, html: {id: 'editSensorForm'} do |f| %>
   <div class="row mt-5 mx-auto">
     <div class="col-xs my-auto">
       <h1>
@@ -17,7 +17,7 @@
         <!-- Facility manipulation button group -->
         <div class="btn-group form-toggle" role="group" aria-label="Manipulate facility">
           <%= link_to ion_icon('edit'), 'javascript:void(0)', class: 'btn btn-info facility-manip', title: 'Edit the sensor', onclick: 'editAttributes()' %>
-          <%= link_to ion_icon('trash-b'), facility_sensor_path(@sensor,), method: :delete, class: 'btn btn-danger facility-manip', title: 'Delete the facility', data: { confirm: 'Are you sure?' } %>
+          <%= link_to ion_icon('trash-b'), facility_sensor_path(@sensor, @facility.id), method: :delete, class: 'btn btn-danger facility-manip', title: 'Delete the sensor', data: { confirm: 'Are you sure?' } %>
         </div>
       </div>
     <% end %>

@@ -67,6 +67,18 @@ function autocompleteSearch(textbox) {
 
 // Fires when the page loads
 $(document).ready(function() {
+    // Set a min button width for .manip-button
+    var maxwidth = 10;
+
+    // See if there's any buttons larger and set all buttons to the same width
+    $(".manip-button").each(function() {
+        console.log($(this).width());
+        if ($(this).width() > maxwidth) {
+            maxwidth = $(this).width();
+        }
+    });
+    $(".manip-button").width(maxwidth);
+
     // Fires when the search box is clicked
     $("#searchBox").on("click", function(event) {
         // Prevent the default dropdown functionality when the text box is clicked, since it's buggy with text boxes
