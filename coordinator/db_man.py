@@ -38,7 +38,7 @@ class DatabaseManager():
         long_address: the long address of the Point to retrieve
         """
         
-        self.__cur.execute('SELECT *, rowid FROM points WHERE long_address = ?;', (long_address,))
+        self.__cur.execute('SELECT *, rowid FROM points WHERE point_id = ?;', (long_address,))
         return Point(**self.__cur.fetchone())
     
         
@@ -49,7 +49,7 @@ class DatabaseManager():
         point: the Point to be added to the database
         """
         
-        self.__cur.execute("INSERT INTO points (long_address) VALUES (?);", (point.long_address,))
+        self.__cur.execute("INSERT INTO points (point_id) VALUES (?);", (point.long_address,))
         self.__conn.commit()
     
         
@@ -65,7 +65,7 @@ class DatabaseManager():
                                 (rules INNER JOIN rule_point ON rules.rowid = rule_id) 
                                     INNER JOIN points AS sensors ON sensors.rowid = point_id 
                                         INNER JOIN points AS target_devices ON target_devices.rowid = target_device
-                                        WHERE sensors.long_address = ?;""", (sensor.long_address,))
+                                        WHERE sensors.point_id = ?;""", (sensor.point_id,))
         return [Rule(rowid=rule['rowid'], expression=rule['expression'], target_device=Point(rowid=rule['target_device'], long_address=rule['long_address']), action=rule['action']) for rule in self.__cur.fetchall()]
         
         
@@ -111,7 +111,7 @@ class DatabaseManager():
         rule_id = self.__cur.fetchone()['rowid']
         point_ids = []
         for long_address in long_addresses:
-            self.__cur.execute("SELECT rowid FROM points WHERE long_address = ?;", (long_address,))
+            self.__cur.execute("SELECT rowid FROM points WHERE point_id = ?;", (long_address,))
             point_ids.append(self.__cur.fetchone()['rowid'])
         print point_ids
         print [(rule_id, point_id) for point_id in point_ids]

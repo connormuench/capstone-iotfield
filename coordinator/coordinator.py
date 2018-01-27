@@ -5,7 +5,7 @@ from db_man import DatabaseManager
 from os import path
 from point import Point
 from prog_xbee import ProgrammableXBee
-from ws4py.client.threadedclient import WebSocketClient
+#from ws4py.client.threadedclient import WebSocketClient
 
 # String constants
 CONFIG_PATH = 'coordinator.json'
@@ -27,24 +27,26 @@ last_reading = {}
 # Declare the XBee and ws so the functions have access to it
 xbee = None
 ws = None
-
+'''
 class PiClient(WebSocketClient):
     def __init__(self, address, headers=None):
-        #self.id = ''
+        self.isconnected = False
         WebSocketClient.__init__(self, address, headers=headers)
 
     def opened(self):
+        self.isconnected = True
         print('success')
        # pass
 
     def closed(self, code, reason=None):
+        self.isconnected = False
         print('closed')
        # pass
 
     def received_message(self, m):
         handle_message(str(m), self) #string rep of m
         print(m)
-        
+   '''     
 def handle_message(msg, ws):
     '''
     Handles messages received by the client
@@ -58,6 +60,8 @@ def handle_message(msg, ws):
         if params['action'] == 'id-verification':
             if 'status' in params and params['status'].lower() == 'new':
                 env['pi_id'] = params['id']
+                with open(CONFIG_PATH, 'w') as config_file:
+                    json.dump(env, config_file)
                 print('id: ' + env['pi_id'])
         # Server can refuse the connection for any reason
         if params['action'] == 'connection-refused':
@@ -97,10 +101,14 @@ def send_to_server(data, long_address):
     last_reading[long_address] = re.search('[^:]*:(\d+)\s*.*', packet['rf_data']).group(0)
     data: string of data to send
     """
-    match = re.search('([^:]*):([-+]?\d+(?:\.\d+)?)\s*(.*)', reading)
+    match = re.search('([^:]*):([-+]?\d+(?:\.\d+)?)\s*(.*)', data)
+    print(data)
+    print(match.group(1))
+    print(match.group(2))
+    print(match.group(3))
     
-    ws.send(json.dumps({'action': 'record', 'address': long_address, 'remote_id': match.group(0), 'value': match.group(1), 'unit': match.group(2)}))
-    
+    ws.send(json.dumps({'action': 'record', 'address': long_address, 'remote_id': match.group(1), 'value': match.group(2), 'unit': match.group(3)}))
+    print("end of send_to_server")
     
    #TODO 
 def perform_rule_action(long_address, action):
@@ -154,7 +162,7 @@ def handle_rx_packet(packet):
     
     # Check if the packet is an initial connection packet from a point
     if POINT_CONN_MSG in packet['rf_data']:
-        points = packet['rf_data'][len(POINT_CONN_MSG):] #includes name and type
+        '''points = packet['rf_data'][len(POINT_CONN_MSG):] #includes name and type
         counter_NameArr = 0
         for point in points.split(';'):
             point_id = long_address + ':' + str(counter_NameArr)
@@ -164,8 +172,6 @@ def handle_rx_packet(packet):
                 pt_type = "sensor"
             else: 
                 pt_type = "controllable_device"
-                
-            pt_type = point_split[1]
             
         # Check to see if the point was already connected : point is always going to be a key from the dictionary from get all points
             if point_id in points_joined: #returns a boolean (1 if true ) 
@@ -177,7 +183,7 @@ def handle_rx_packet(packet):
                 if not pt_type in points_waiting: 
                     points_waiting[pt_type] = {}
                 points_waiting[pt_type][point_id] = name
-            counter_NameArr += 1  
+            counter_NameArr += 1  '''
 
         xbee.tx(dest_addr_long=long_address.decode('hex'), data=CONN_CONFIRM_MSG)
        
@@ -193,12 +199,12 @@ def handle_rx_packet(packet):
         return
     
     # Point is sending data intended for the server, so cache the value, pass it on and check if there are any rules set on the sensor value
-    for reading in packet['rf_data'].split(';'):
+    '''for reading in packet['rf_data'].split(';'):
         match = re.search('([^:]*):([-+]?\d+(?:\.\d+)?)\s*.*', reading)
-        point_id = long_address + ":" + match.group(0) #match.group(0) is the ID number of the points in the point (ex: 0: temp sensor means 0 is the ID number)
-        last_reading[point_id] = match.group(1)
-        send_to_server(reading, long_address)
-        enforce_rules(point_id)
+        point_id = long_address + ":" + match.group(1) #match.group(0) is the ID number of the points in the point (ex: 0: temp sensor means 0 is the ID number)
+        last_reading[point_id] = match.group(2)
+        #send_to_server(reading, long_address)
+        #enforce_rules(point_id)'''
     
 
 def xbee_callback(packet):
@@ -220,22 +226,31 @@ def xbee_callback(packet):
 
 xbee = ProgrammableXBee(env)
 
-try:
-    headers = [('name', env['name']), ('password', env['webserver_password'])]
-    if 'pi_id' in env: #looks thru env def for pi_id which is sent by the server if cant be found (first time around) otherwise it passes it in everytime
-        headers.append(('id', env['pi_id']))
-    ws = PiClient(env['webserver_address'], headers=headers)
-    ws.connect()
-    t = threading.Thread(target=ws.run_forever)
-    t.start()
-    
+"""
+headers = [('name', env['name']), ('password', env['webserver_password'])]
+if 'pi_id' in env: #looks thru env def for pi_id which is sent by the server if cant be found (first time around) otherwise it passes it in everytime
+    headers.append(('id', env['pi_id']))
+print('1')
+ws = PiClient(env['webserver_address'], headers=headers)
+print('2')
+
+while not ws.isconnected:
+    try:
+        print(ws.isconnected)
+        ws.connect()
+        print('Connecting')
+    except Exception:
+        time.sleep(5)
+t = threading.Thread(target=ws.run_forever)
+t.start()
+    """
 while True:
     try:
-        
         xbee_callback(xbee.wait_read_frame())
+        print("finished xbee_callback")
     except KeyboardInterrupt:
-        ws.close()
-        t.join()
+        #ws.close()
+        #t.join()
         break
         
 xbee.halt()
