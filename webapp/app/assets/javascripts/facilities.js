@@ -34,6 +34,7 @@ $(document).ready(function() {
         // Retrieve the points that are addable for the current facility
         $.get("/facilities/" + facId + "/addable",
             function(data) {
+                console.log(data);
                 // Clear the select options before adding the current options
                 var sensorSelect = $("#availableSensors");
                 var controllableDeviceSelect = $("#availableControllableDevices");

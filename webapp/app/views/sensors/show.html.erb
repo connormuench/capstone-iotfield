@@ -1,5 +1,5 @@
 <%= form_for [@facility, @sensor], method: :patch, html: {id: 'editSensorForm'} do |f| %>
-  <%= render partial: 'points/show.html.erb', locals: { point: @sensor.point, point_type: "sensor", path: facility_sensor_path(@sensor, @facility.id) } %>
+  <%= render partial: 'points/show.html.erb', locals: { point: @sensor.point, point_type: "sensor", path: facility_sensor_path(@facility.id,@sensor) } %>
 <% end %>
 
-<%= line_chart @data, xtitle: "Time", ytitle: @unit %>
+<%= line_chart @data, xtitle: "Time", ytitle: @unit unless @data.count==0 %>

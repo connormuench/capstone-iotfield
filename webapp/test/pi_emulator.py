@@ -73,10 +73,10 @@ class PiClient(WebSocketClient):
         handle_message(str(m), self)
         print(m)
 
-def sendData(ws,temp):
+def sendData(ws):
     if 'sensor' in points_joined:
         for sensor in points_joined['sensor']:
-            ws.send(json.dumps({'action': 'record', 'address': sensor['id'].split(':')[0], 'remote_id': int(sensor['id'].split(':')[1]), 'value': temp= random.randint(20,25), 'unit': 'degC'}))
+            ws.send(json.dumps({'action': 'record', 'address': sensor.split(':')[0], 'remote_id': int(sensor.split(':')[1]), 'value': random.randint(20,25), 'unit': 'degC'}))
 
 if __name__ == '__main__':
     random.seed()
@@ -89,7 +89,7 @@ if __name__ == '__main__':
         while t.isAlive():
             t.join(1)
             time.sleep(2)
-            sendData(ws,temp)
+            sendData(ws)
     except KeyboardInterrupt:
         ws.close()
         t.join()

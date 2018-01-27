@@ -54,7 +54,7 @@ Thread.new {
       # Callback to run whenever a new message is received
       ws.onmessage { |msg|
         jsonified_msg = JSON.parse(msg)
-
+        puts msg
         if jsonified_msg.key?('action')
 
           # ACTION: available-points
@@ -66,8 +66,10 @@ Thread.new {
           elsif jsonified_msg['action'] == 'record'
             # Identify the specified end device and point
             end_device = EndDevice.where(address: jsonified_msg['address']).first
+            puts end_device.nil?
             if !end_device.nil?
-              point = end_device.points.find { |point| point.remote_id == jsonified_msg['remote_id'] }
+              point = end_device.points.find { |point| point.remote_id.to_s == jsonified_msg['remote_id'] }
+              puts point.nil?
               if !point.nil?
                 # Add the record to the point's list of records
                 record = point.records.new(value: jsonified_msg['value'], unit: jsonified_msg['unit'])
@@ -76,7 +78,7 @@ Thread.new {
             end
           end
         end
-        ws.send({pong: msg}.to_json)
+        #ws.send({pong: msg}.to_json)
       }
 
       # Callback to run whenever a connection is closed

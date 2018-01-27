@@ -8,6 +8,14 @@ class ControllableDevicesController < ApplicationController
 
   # GET /facilities/1/controllable_devices/1
   def show
+    records = @controllable_device.point.records
+    @data = {}
+    records.each do |record|
+      @data[record.created_at] = record.value
+    end
+    if records.count > 0
+      @unit=@sensor.point.records.first.unit
+    end
   end
 
   # POST /facilities/1/controllable_devices

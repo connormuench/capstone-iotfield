@@ -1,5 +1,5 @@
 <%= form_for [@facility, @controllable_device], method: :patch, html: {id: 'editSensorForm'} do |f| %>
-  <%= render partial: 'points/show.html.erb', locals: { point: @controllable_device.point, point_type: "controllable device", path: facility_controllable_device_path(@controllable_device, @facility.id) } %>
+  <%= render partial: 'points/show.html.erb', locals: { point: @controllable_device.point, point_type: "controllable device", path: facility_controllable_device_path(@facility.id, @controllable_device) } %>
 <% end %>
 
 <div class="row my-2">
@@ -28,3 +28,60 @@
             <input type="radio" name="pointTypes" id="controllableDeviceOption" autocomplete="off"> AUTO
           </label>
         </div>
+
+<table class="table table-bordered table-hover table-sm" id="rules-table" >
+    <thead>
+    <tr>
+      <th scope="col">Active</th>
+      <th scope="col">Expression</th>
+      <th scope="col">Action</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody id="rule-rows">
+    <tr>
+      <td class="text-center align-middle">
+        <div class="form-check my-auto">
+          <label class="custom-control custom-checkbox my-auto mx-auto is-active-checkbox">
+            <input type="hidden" name="rules_attributes[][is_active]" value="0">
+            <input class="custom-control-input" type="checkbox" name="rules_attributes[][is_active]">
+            <span class="custom-control-indicator"></span>
+          </label>
+        </div>
+      </td>
+
+      <td>
+        <div class="input-group">
+          <input class="form-control" type="text" name="rules_attributes[][expression]">
+          <div class="input-group-btn expression-button">
+            <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle=dropdown>
+              <span class="ion-radio-waves"></span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right pointDropdown">
+              <span class="dropdown_item">
+                <input class="form-control mx-auto" type="text" onkeyup="updateList(this)" style="width: 100%;">
+              </span>
+            </div>
+          </div>
+            
+          </input>
+        </div>
+      </td>
+      <td>
+        <input class="form_control" type="text" name="rules_attributes[][action]">
+        </input>
+      </td>
+      <td class="text-center align-middle">
+        <button class="btn btn-sm btn-danger" onclick="deleteRuleRow(this)" type="button">
+          <span class="ion-trash-b"></span>
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+
+
+<%= line_chart @data, xtitle: "Time", ytitle: @unit unless @data.count==0 %>
