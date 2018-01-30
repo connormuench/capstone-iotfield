@@ -3,7 +3,7 @@
   <head>
     <title>Webapp</title>
     <%= csrf_meta_tags %>
-    <%= javascript_include_tag "https://www.gstatic.com/charts/loader.js" %>
+    <!--%= javascript_include_tag "https://www.gstatic.com/charts/loader.js" %-->
 
     <%= stylesheet_link_tag    'application', media: 'all' %>
     <%= javascript_include_tag 'application' %>
@@ -37,7 +37,7 @@
             <!-- Visualization link -->
             <ul class="navbar-nav ml-md-2">
               <li class="nav-item">
-                <a class="nav-link" href="#">Visualization</a>
+                <%= link_to 'Visualization', visualization_path, class: 'nav-link' %>
               </li>
             </ul>
           <% end %>

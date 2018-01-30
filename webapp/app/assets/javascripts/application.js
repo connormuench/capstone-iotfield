@@ -12,12 +12,19 @@
 //
 //= require jquery3
 //= require rails-ujs
-//= require_tree .
 
 //= require popper
 //= require bootstrap-sprockets
+//= require moment
+//= require tempusdominus-bootstrap-4.js
 
+//= require gijgo/core.min
+//= require gijgo/checkbox.min
+//= require gijgo/tree.min
+
+//= require Chart.bundle
 //= require chartkick
+//= require_tree .
 
 // Function to populate the sitewide search box dropdown
 function autocompleteSearch(textbox) {
@@ -74,7 +81,6 @@ $(document).ready(function() {
 
     // See if there's any buttons larger and set all buttons to the same width
     $(".manip-button").each(function() {
-        console.log($(this).width());
         if ($(this).width() > maxwidth) {
             maxwidth = $(this).width();
         }

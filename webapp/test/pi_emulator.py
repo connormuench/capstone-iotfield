@@ -88,7 +88,7 @@ if __name__ == '__main__':
         t.start()
         while t.isAlive():
             t.join(1)
-            time.sleep(2)
+            time.sleep(5)
             sendData(ws)
     except KeyboardInterrupt:
         ws.close()

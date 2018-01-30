@@ -1,4 +1,4 @@
-class ControllableDevicesController < ApplicationController
+class ControllableDevicesController < PointsController
   require 'pi_lists'
 
   before_action :set_controllable_device, only: [:show, :update, :destroy]
@@ -9,12 +9,9 @@ class ControllableDevicesController < ApplicationController
   # GET /facilities/1/controllable_devices/1
   def show
     records = @controllable_device.point.records
-    @data = {}
-    records.each do |record|
-      @data[record.created_at] = record.value
-    end
+    @data = records_to_hash records
     if records.count > 0
-      @unit=@sensor.point.records.first.unit
+      @unit = @sensor.point.records.first.unit
     end
   end
 

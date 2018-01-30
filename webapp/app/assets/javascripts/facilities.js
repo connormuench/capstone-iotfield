@@ -34,7 +34,6 @@ $(document).ready(function() {
         // Retrieve the points that are addable for the current facility
         $.get("/facilities/" + facId + "/addable",
             function(data) {
-                console.log(data);
                 // Clear the select options before adding the current options
                 var sensorSelect = $("#availableSensors");
                 var controllableDeviceSelect = $("#availableControllableDevices");
@@ -105,18 +104,15 @@ function addRuleRow() {
         .append($("<td>")
             .attr("class", "text-center align-middle")
             .append($("<div>")
-                .attr("class", "form-check my-auto")
-                .append($("<label>")
-                    .attr("class", "custom-control custom-checkbox my-auto mx-auto is-active-checkbox")
-                    .append($("<input>")    // Hidden input field to placehold the unchecked state of the checkbox
-                        .attr("type", "hidden")
-                        .attr("name", "rules_attributes[][is_active]")
-                        .attr("value", "0"))
-                    .append($("<input>")    // is_active checkbox
-                        .attr("class", "custom-control-input")
-                        .attr("type", "checkbox")
-                        .attr("name", "rules_attributes[][is_active]"))
-                    .append($("<span>").attr("class", "custom-control-indicator")))))
+                .attr("class", "is-active-checkbox")
+                .append($("<input>")    // Hidden input field to placehold the unchecked state of the checkbox
+                    .attr("type", "hidden")
+                    .attr("name", "rules_attributes[][is_active]")
+                    .attr("value", "0"))
+                .append($("<input>")    // is_active checkbox
+                    .attr("class", "my-auto mx-auto")
+                    .attr("type", "checkbox")
+                    .attr("name", "rules_attributes[][is_active]"))))
         .append($("<td>")
             .append($("<div>")      // Expression input group
                 .attr("class", "input-group")
@@ -205,7 +201,7 @@ function updateList(textField) {
             dropdown.append($("<a>")
                 .attr("class", "dropdown-item")
                 .attr("href", "#")
-                .attr("onclick", "return facilityClicked(this)")
+                .attr("onclick", "return sensorClicked(this)")
                 .html(value.replace(new RegExp(textFieldVal, "i"), function(match) {
                     return "<b>" + match + "</b>";      // Bold the query
                 })));
@@ -215,9 +211,9 @@ function updateList(textField) {
 
 // Function to add the selected sensor's ID to the expression
 function sensorClicked(element) {
-    textboxVal = $(element.closest("input.form-control")).val();
+    let expressionTextbox = $($(element.closest(".input-group-btn")).siblings("input.form-control"));
+    textboxVal = expressionTextbox.val();
     textboxVal = typeof(textboxVal) === "undefined" ? "" : textboxVal;
-    expressionTextbox = $($(element.closest(".input-group-btn")).siblings("input.form-control"))
     expressionTextbox.val(textboxVal + $(element).text());
     expressionTextbox.focus();
     return false;

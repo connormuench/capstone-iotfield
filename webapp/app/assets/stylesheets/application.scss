@@ -12,8 +12,13 @@
  *
  */
 
- @import "bootstrap";
- @import "ionicons";
+@import "bootstrap";
+@import "ionicons";
+@import "font-awesome";
+@import "tempusdominus-bootstrap-4";
+@import "gijgo/core.min";
+@import "gijgo/checkbox.min";
+@import "gijgo/tree.min";
  
 .required::after {
     content: " *";
@@ -23,4 +28,8 @@
 
 span.required::after {
     content: "*";
+}
+
+.btn-group input[type="radio"] {
+    display: none;
 }

@@ -3,34 +3,34 @@
 <% end %>
 
 <div class="row my-2">
-<div class="col-sm-2">
-  <b class="my-auto">Status</b>
-</div>
-<div class="col-sm-10">
-  <span> <%= @controllable_device.status %> </span>
-</div>
-</div>
+  <div class="col-sm-2">
+    <b class="my-auto">Status</b>
+  </div>
+  <div class="col-sm-10">
+    <span> <%= @controllable_device.status %> </span>
+  </div>
+  </div>
 
-<div class="row my-2">
-<div class="col-sm-2">
-  <b class="my-auto">Mode</b>
-</div>
-<div class="col-sm-10">
-  <span> <%= @controllable_device.mode %> </span>
-</div>
+  <div class="row my-2">
+  <div class="col-sm-2">
+    <b class="my-auto">Mode</b>
+  </div>
+  <div class="col-sm-10">
+    <span> <%= @controllable_device.mode %> </span>
+  </div>
 </div>
 
 <div class="btn-group mt-2" data-toggle="buttons">
-    <label class="btn btn-primary active">
-       <input type="radio" name="pointTypes" id="sensorOption" autocomplete="off" checked> MANUAL
-   </label>
-          <label class="btn btn-primary">
-            <input type="radio" name="pointTypes" id="controllableDeviceOption" autocomplete="off"> AUTO
-          </label>
-        </div>
+  <label class="btn btn-primary active">
+    <input type="radio" name="pointTypes" id="sensorOption" autocomplete="off" checked> MANUAL
+  </label>
+  <label class="btn btn-primary">
+    <input type="radio" name="pointTypes" id="controllableDeviceOption" autocomplete="off"> AUTO
+  </label>
+</div>
 
 <table class="table table-bordered table-hover table-sm" id="rules-table" >
-    <thead>
+  <thead>
     <tr>
       <th scope="col">Active</th>
       <th scope="col">Expression</th>
@@ -80,8 +80,6 @@
   </tbody>
 </table>
 
-
-
-
-
-<%= line_chart @data, xtitle: "Time", ytitle: @unit unless @data.count==0 %>
+<div id="pointChart" data-point-id="<%= @controllable_device.point.id %>"<%= if @data.count == 0 %> style="display: none;'<% end %>">
+  <%= line_chart [{name: @controllable_device.point.name, data: @data}], id: 'chart', xtitle: 'Time', ytitle: @unit %>
+</div>

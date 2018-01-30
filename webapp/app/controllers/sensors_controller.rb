@@ -1,4 +1,4 @@
-class SensorsController < ApplicationController
+class SensorsController < PointsController
   require 'pi_lists'
   
   before_action :set_sensor, only: [:show, :update, :destroy]
@@ -9,12 +9,11 @@ class SensorsController < ApplicationController
   # GET /facilities/1/sensors/1
   def show
     records = @sensor.point.records
-    @data = {}
-    records.each do |record|
-      @data[record.created_at] = record.value
-    end
+    @data = chart_data_from_points [@sensor.point]
     if records.count > 0
-      @unit=@sensor.point.records.first.unit
+      @unit = records.first.unit
+    else
+      @unit = 'unitless'
     end
   end
 
