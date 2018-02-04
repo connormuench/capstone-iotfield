@@ -49,7 +49,6 @@
                 <button type="button" class="btn btn-success btn-sm" onclick="addRuleRow()"><%= ion_icon "plus" %></button>
               </div>
             </div>
-            <% require "json" %>
             <% available_points = {} %>
             <% current_user.facilities.each do |facility| %>
               <% facility.points.each do |point| %>

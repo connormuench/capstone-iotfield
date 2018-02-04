@@ -1,85 +1,87 @@
-<%= form_for [@facility, @controllable_device], method: :patch, html: {id: 'editSensorForm'} do |f| %>
+<%= form_for [@facility, @controllable_device], method: :patch, html: {id: 'editForm', onsubmit: 'submitted()'} do |f| %>
   <%= render partial: 'points/show.html.erb', locals: { point: @controllable_device.point, point_type: "controllable device", path: facility_controllable_device_path(@facility.id, @controllable_device) } %>
-<% end %>
-
-<div class="row my-2">
-  <div class="col-sm-2">
-    <b class="my-auto">Status</b>
-  </div>
-  <div class="col-sm-10">
-    <span> <%= @controllable_device.status %> </span>
-  </div>
-  </div>
 
   <div class="row my-2">
-  <div class="col-sm-2">
-    <b class="my-auto">Mode</b>
+    <div class="col-sm-2">
+      <b class="my-auto">Status</b>
+    </div>
+    <div class="col-sm-10">
+      <span> <%= @controllable_device.status %> </span>
+    </div>
   </div>
-  <div class="col-sm-10">
-    <span> <%= @controllable_device.mode %> </span>
+
+  <div class="btn-group mt-2" data-toggle="buttons">
+    <label class="btn btn-primary active">
+      <input type="radio" id="sensorOption" autocomplete="off" checked> MANUAL
+    </label>
+    <label class="btn btn-primary">
+      <input type="radio" id="controllableDeviceOption" autocomplete="off"> AUTO
+    </label>
   </div>
-</div>
 
-<div class="btn-group mt-2" data-toggle="buttons">
-  <label class="btn btn-primary active">
-    <input type="radio" name="pointTypes" id="sensorOption" autocomplete="off" checked> MANUAL
-  </label>
-  <label class="btn btn-primary">
-    <input type="radio" name="pointTypes" id="controllableDeviceOption" autocomplete="off"> AUTO
-  </label>
-</div>
-
-<table class="table table-bordered table-hover table-sm" id="rules-table" >
-  <thead>
-    <tr>
-      <th scope="col">Active</th>
-      <th scope="col">Expression</th>
-      <th scope="col">Action</th>
-      <th scope="col"></th>
-    </tr>
-  </thead>
-  <tbody id="rule-rows">
-    <tr>
-      <td class="text-center align-middle">
-        <div class="form-check my-auto">
-          <label class="custom-control custom-checkbox my-auto mx-auto is-active-checkbox">
-            <input type="hidden" name="rules_attributes[][is_active]" value="0">
-            <input class="custom-control-input" type="checkbox" name="rules_attributes[][is_active]">
-            <span class="custom-control-indicator"></span>
-          </label>
-        </div>
-      </td>
-
-      <td>
-        <div class="input-group">
-          <input class="form-control" type="text" name="rules_attributes[][expression]">
-          <div class="input-group-btn expression-button">
-            <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle=dropdown>
-              <span class="ion-radio-waves"></span>
-            </button>
-            <div class="dropdown-menu dropdown-menu-right pointDropdown">
-              <span class="dropdown_item">
-                <input class="form-control mx-auto" type="text" onkeyup="updateList(this)" style="width: 100%;">
-              </span>
+  <div class="row mx-auto">
+    <div class="col-xs my-auto">
+      <h5>Automation Rules</h5>
+    </div>
+    <div class="col-xs ml-3 my-auto pb-2">
+      <button type="button" class="btn btn-success btn-sm form-toggle" onclick="addRuleRow()" style= "display: none;"><%= ion_icon "plus" %></button>
+    </div>
+  </div>
+  <table class="table table-bordered table-hover table-sm" id="rules-table" >
+    <thead>
+      <tr>
+        <th scope="col">Active</th>
+        <th scope="col">Expression</th>
+        <th scope="col">Action</th>
+        <% if @access_level.level.downcase == "controller" %>
+          <th scope="col"></th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody id="rule-rows">
+      <% @controllable_device.rules.each do |rule| %>
+        <tr>
+          <td class="text-center align-middle">
+            <div class="is-active-checkbox form-toggle">
+              <input class="my-auto mx-auto" type="checkbox" disabled<%= ' checked' if rule.is_active %>>
             </div>
-          </div>
-            
-          </input>
-        </div>
-      </td>
-      <td>
-        <input class="form_control" type="text" name="rules_attributes[][action]">
-        </input>
-      </td>
-      <td class="text-center align-middle">
-        <button class="btn btn-sm btn-danger" onclick="deleteRuleRow(this)" type="button">
-          <span class="ion-trash-b"></span>
-        </button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+            <div class="is-active-checkbox form-toggle" style="display: none;">
+              <input type="hidden" name="rules_attributes[<%= rule.id %>][is_active]" value="0">
+              <input class="my-auto mx-auto" type="checkbox" name="rules_attributes[<%= rule.id %>][is_active]" <%= ' checked' if rule.is_active %>>
+            </div>
+          </td>
+          <td>
+            <input type="text" class="form-control-plaintext form-toggle" value="<%= rule.expression %>" readonly>
+            <div class="input-group form-toggle" style= "display: none;">
+              <input class="form-control" type="text" name="rules_attributes[][expression]" value="<%= rule.expression %>">
+              <div class="input-group-btn expression-button">
+                <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle=dropdown>
+                  <span class="ion-radio-waves"></span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right pointDropdown">
+                  <span class="dropdown_item">
+                    <input class="form-control mx-auto" type="text" onkeyup="updateList(this)" style="width: 100%;">
+                  </span>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <input type="text" class="form-control-plaintext form-toggle" value="<%= rule.action %>" readonly>
+            <input class="form-control form-toggle" type="text" name="rules_attributes[][action]" style="display: none;" value="<%= rule.action %>">
+          </td>
+          <% if @access_level.level.downcase == "controller" %>
+            <td class="text-center align-middle">
+              <button class="btn btn-sm btn-danger" onclick="deleteRuleRow(this)" type="button">
+                <span class="ion-trash-b"></span>
+              </button>
+            </td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 
-<div id="pointChart" data-point-id="<%= @controllable_device.point.id %>"<%= if @data.count == 0 %> style="display: none;'<% end %>">
-  <%= line_chart [{name: @controllable_device.point.name, data: @data}], id: 'chart', xtitle: 'Time', ytitle: @unit %>
-</div>
+<% end %>
+
+<%= render partial: 'points/show_chart.html.erb', locals: {point_id: @controllable_device.point.id} %>

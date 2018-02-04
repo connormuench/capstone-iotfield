@@ -1,13 +1,11 @@
-<%= form_for [@facility, @sensor], method: :patch, html: {id: 'editSensorForm'} do |f| %>
+<%= form_for [@facility, @sensor], method: :patch, html: {id: 'editForm'} do |f| %>
   <%= render partial: 'points/show.html.erb', locals: { point: @sensor.point, point_type: "sensor", path: facility_sensor_path(@facility.id,@sensor) } %>
 <% end %>
 
 <%= render partial: 'points/filter_chart.html.erb', locals: { select_points: false } %>
 
-<div id="pointChart" data-point-id="<%= @sensor.point.id %>"<% if @data.count == 0 %> style="display: none;"<% end %>>
-  <%= line_chart @data, id: 'chart', xtitle: 'Time', ytitle: @unit %>
-  <div class="form-check text-center">
-    <input class="form-check-input" type="checkbox" id="autoUpdateChart" checked>
-    <label class="form-check-label mx-auto" for="autoUpdateChart">Auto-update</label>
-  </div>
-</div>
+
+
+<%= render partial: 'points/show_chart.html.erb', locals: {point_id: @sensor.point.id} %>
+
+

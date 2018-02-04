@@ -167,6 +167,7 @@ function addRuleRow() {
 
 // Function to execute immediately before form submission
 function submitted() {
+    console.log($("form").serialize());
     // Disable any hidden field if its corresponding checkbox is checked
     $(".is-active-checkbox").each(function() {
         if ($(this).find("input:checkbox")[0].checked) {

@@ -9,10 +9,11 @@ class ControllableDevicesController < PointsController
   # GET /facilities/1/controllable_devices/1
   def show
     records = @controllable_device.point.records
-    @data = records_to_hash records
+    @data = chart_data_from_points [@controllable_device.point]
     if records.count > 0
-      @unit = @sensor.point.records.first.unit
+      @unit = @controllable_device.point.records.first.unit
     end
+    @access_level = current_user.access_levels.where(facility_id: @facility.id).first
   end
 
   # POST /facilities/1/controllable_devices
@@ -76,6 +77,7 @@ class ControllableDevicesController < PointsController
 
   # PATCH/PUT /facilities/1/controllable_devices/1
   def update
+    puts "hi bob"
     if @controllable_device.point.update(point_params)
       redirect_to [@facility, @controllable_device], notice: 'Controllable device was successfully updated.'
     else
