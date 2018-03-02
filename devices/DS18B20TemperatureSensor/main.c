@@ -61,6 +61,7 @@ bool_t rx_ready = FALSE;
 bool_t at_ready = FALSE;
 int joined = 0;
 int32_t sleep_time = 0;
+int counter_pointid=0;
 
 /*
  * Handles responses to the SN command
@@ -148,9 +149,10 @@ void main(void)
 	sys_hw_init();
 	sys_xbee_init();
 	sys_app_banner();
+	//int counter_pointid
 	
-	// Initialize the DS18B20 sensor
-	ret = ds18b20_config(NULL, DS18B20_TH_CFG, DS18B20_TL_CFG, DS18B20_RESOLUTION_CFG);
+	// Initialize the GPIO pin
+	ret = gpio_config(NULL, DS18B20_TH_CFG, DS18B20_TL_CFG, DS18B20_RESOLUTION_CFG);
 	if (ret < 0)
 		printf("error");
 
@@ -164,7 +166,7 @@ void main(void)
 	// Don't bother sending data until the coordinator is accepting data from this device
 	rx_ready = FALSE;
 	wpan_envelope_create(&env, &xdev.wpan_dev, WPAN_IEEE_ADDR_COORDINATOR, WPAN_NET_ADDR_UNDEFINED);
-	xbee_transparent_serial_str(&env, "Waiting to join...");
+	xbee_transparent_serial_str(&env, "JoiningTemp Sensor Calgary Facility:s");
 	tick_xbee();
 	while (!rx_ready)
 	{
@@ -176,6 +178,7 @@ void main(void)
 	
 	// Wait 2 seconds to clear out any initialization commands that may still be queued
 	rtc_set_timeout(HZ * 2);
+	//int counter_pointid=0; //added by mar
 	while (!rtc_timeout_expired())
 		tick_xbee();
 	
@@ -187,19 +190,21 @@ void main(void)
 			// Convert the temperature into a readable format and send it to the coordinator
 			char s[60];
 			if (temperature >= 0)
-			{
+			{   
 				sprintf(s, "s1:%d.%02d degC", temperature / 100, temperature % 100);
-				printf("\nTemperature is: %d.%02d\n", temperature / 100, temperature % 100);
+				//printf(counter_pointid)
+				printf("%s",counter_pointid,": %d.%02d\n", temperature / 100, temperature % 100);
 				xbee_transparent_serial_str(&env, s);
 			}
 			else
 			{
 				sprintf(s, "s1:-%d.%02d degC", -temperature / 100, -temperature % 100);
-				printf("\nTemperature is: -%d.%02d", -temperature / 100, -temperature % 100);
+				printf("%s",counter_pointid,": -%d.%02d", -temperature / 100, -temperature % 100);
 				xbee_transparent_serial_str(&env, s);
 			}
+			counter_pointid+=1;
 		}
-
+counter_pointid=0;
 		// Retrieve the SN value from the local XBee to know how long to sleep for
 		at_ready = FALSE;
 		rtc_set_timeout(1);
@@ -225,3 +230,4 @@ void main(void)
 		tick_xbee();
 	}
 }
+

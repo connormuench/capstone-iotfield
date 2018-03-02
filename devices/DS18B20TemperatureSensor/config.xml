@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
-  <deviceType>XBee ZB (S2CTH)</deviceType>
+  <deviceType>XBee ZB (S2B)</deviceType>
   <component name="system0">
     <id>system</id>
     <settings>
@@ -14,7 +14,7 @@
       </setting>
       <setting name="Enable Watchdog">
         <id>enable_watchdog</id>
-        <value>True</value>
+        <value>False</value>
       </setting>
       <setting name="Watchdog timeout">
         <id>watchdog_timeout</id>
@@ -59,6 +59,10 @@
       </setting>
       <setting name="RSSI PWM Pin">
         <id>rssi_pwm_pin</id>
+        <value>Enabled</value>
+      </setting>
+      <setting name="sleep_request_pin">
+        <id>sleep_request_pin</id>
         <value>Enabled</value>
       </setting>
     </settings>
@@ -128,7 +132,7 @@
           </setting>
           <setting name="Modem status processing">
             <id>modem_status</id>
-            <value>Enabled</value>
+            <value>Disabled</value>
           </setting>
           <setting name="Process transmit status">
             <id>transmit_status</id>
@@ -140,7 +144,7 @@
           </setting>
           <setting name="Process incoming frames">
             <id>packet_reception_ao</id>
-            <value>Disabled</value>
+            <value>None</value>
           </setting>
           <setting name="Over-the-Air Firmware Update">
             <id>ota_update_enable</id>
@@ -151,6 +155,27 @@
             <value></value>
           </setting>
         </settings>
+      </setting>
+    </settings>
+    <pin_distribution>
+      <template name="Default template" locked="false">
+      </template>
+    </pin_distribution>
+  </component>
+  <component name="ds18b200">
+    <id>ds18b20</id>
+    <settings>
+      <setting name="Resolution">
+        <id>resolution</id>
+        <value>12 bits</value>
+      </setting>
+      <setting name="High level alarm limit">
+        <id>th</id>
+        <value>85</value>
+      </setting>
+      <setting name="Low level alarm limit">
+        <id>tl</id>
+        <value>-85</value>
       </setting>
     </settings>
     <pin_distribution>
@@ -203,55 +228,6 @@
       </template>
     </pin_distribution>
   </component>
-  <component name="power_management0">
-    <id>power_management</id>
-    <settings>
-      <setting name="Power management mode (SM)">
-        <id>pm_mode</id>
-        <value>Pin sleep</value>
-      </setting>
-      <setting name="Sleep options (SO)">
-        <id>cyclic_sleep_so</id>
-        <value>Extended sleep (SP x SN)</value>
-      </setting>
-      <setting name="Sleep period (SP)">
-        <id>cyclic_sleep_sp</id>
-        <value>5000</value>
-      </setting>
-      <setting name="Time before sleep (ST)">
-        <id>cyclic_sleep_st</id>
-        <value>500</value>
-      </setting>
-      <setting name="Number of sleep periods (SN)">
-        <id>cyclic_sleep_sn</id>
-        <value>65535</value>
-      </setting>
-      <setting name="Keep uptime">
-        <id>keep_uptime</id>
-        <value>True</value>
-      </setting>
-      <setting name="Enable Low-Voltage Detection">
-        <id>lvd_sleep</id>
-        <value>False</value>
-      </setting>
-      <setting name="Enable waking up from UART Reception">
-        <id>wakeup_uart</id>
-        <value>False</value>
-      </setting>
-    </settings>
-    <pin_distribution>
-      <template name="Default template" locked="false">
-        <pin_config name="On Sleep Pin">
-          <selected_pin>13</selected_pin>
-          <is_dynamic>false</is_dynamic>
-        </pin_config>
-        <pin_config name="Sleep Request Pin">
-          <selected_pin>9</selected_pin>
-          <is_dynamic>false</is_dynamic>
-        </pin_config>
-      </template>
-    </pin_distribution>
-  </component>
   <component name="one_wire0">
     <id>one_wire</id>
     <settings>
@@ -264,29 +240,8 @@
       <template name="Default template" locked="false">
         <pin_config name="1-Wire Bus pin">
           <selected_pin>17</selected_pin>
-          <is_dynamic>true</is_dynamic>
+          <is_dynamic>false</is_dynamic>
         </pin_config>
-      </template>
-    </pin_distribution>
-  </component>
-  <component name="ds18b200">
-    <id>ds18b20</id>
-    <settings>
-      <setting name="Resolution">
-        <id>resolution</id>
-        <value>12 bits</value>
-      </setting>
-      <setting name="High level alarm limit">
-        <id>th</id>
-        <value>85</value>
-      </setting>
-      <setting name="Low level alarm limit">
-        <id>tl</id>
-        <value>-85</value>
-      </setting>
-    </settings>
-    <pin_distribution>
-      <template name="Default template" locked="false">
       </template>
     </pin_distribution>
   </component>
