@@ -1,0 +1,19 @@
+<div>
+    <h1>set NAME permissions</h1>
+    <div class="row">
+        <table class="table table-bordered">
+            <tr>
+                <th scope="col">User</th>
+                <th scope="col">Acces Level</th>
+            </tr>
+            <% @fac.each do |user| %>
+                <td><%= users.name%></td>
+                <td>
+                    <div class="btn-group" role="group" aria-label="optionssssss">
+                        <a class="btn btn-warning btn-sm manip-button" title="View the controllable device" href="/facilities/19/controllable_devices/7" style="width: 32px;"><i class="ion-eye-disabled"></i></a>
+                        <a class="btn btn-primary btn-sm manip-button" title="View the controllable device" href="/facilities/19/controllable_devices/7" style="width: 32px;"><i class="ion-eye"></i></a>
+                        <a class="btn btn-info btn-sm manip-button" title="View the controllable device" href="/facilities/19/controllable_devices/7" style="width: 32px;"><i class="ion-settings"></i></a>
+                    </div>
+                </td>
+        </table>
+</div>

@@ -33,3 +33,8 @@ span.required::after {
 .btn-group input[type="radio"] {
     display: none;
 }
+
+.admin-panel-column {
+	max-height: 85%; 
+	overflow-y: scroll;
+}
