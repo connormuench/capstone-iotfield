@@ -13,7 +13,9 @@
       </div>
 
       <div class="col-xs ml-3 my-auto pb-2">
-        <a class="btn btn-success btn-md manip-button" title="View the controllable device" href="#" style="width: 32px;"><i class="ion-plus"></i></a>
+        <button class="btn btn-success btn-md manip-button" title="New user" type="button" data-toggle="modal" data-target="#userModal">
+                <%= ion_icon('plus') %>
+        </button>
       </div>
     </div>
 
@@ -31,7 +33,7 @@
               </div>
               <div class="col-xs ml-auto my-auto">
                 <div class="btn-group" role="group" aria-label="options">
-                  <button class="btn btn-warning btn-sm manip-button" title="Edit access level" type="button" data-toggle="modal" data-target="#userPermissionsModal" data-facility-access-levels="<%= @users[user.id].to_json %>">
+                  <button class="btn btn-warning btn-sm manip-button" title="Edit access level" type="button" data-toggle="modal" data-target="#userPermissionsModal" data-facility-access-levels="<%= @users[user.id].to_json %>" data-target-mod="user">
                     <%= ion_icon('unlocked') %>
                   </button>
                   <%= link_to ion_icon('information'), user_path(user), class: 'btn btn-primary btn-sm manip-button', title: 'View the user' %>
@@ -73,7 +75,7 @@
               </div>
               <div class="col-xs ml-auto my-auto">
                 <div class="btn-group" role="group" aria-label="options">
-                  <button class="btn btn-warning btn-sm manip-button" title="Edit access level" type="button" data-toggle="modal" data-target="#userPermissionsModal" data-facility-access-levels="<%= @users[facility.id].to_json %>">
+                  <button class="btn btn-warning btn-sm manip-button" title="Edit access level" type="button" data-toggle="modal" data-target="#facilityPermissionsModal" data-facility-access-levels="<%= @facilities[facility.id].to_json %>" data-target-mod="facility">
                     <%= ion_icon('unlocked') %>
                   </button>
                   <%= link_to ion_icon('information'), facility_path(facility), class: 'btn btn-primary btn-sm manip-button', title: 'View the Facility' %>
@@ -94,6 +96,9 @@
 
 <%= render partial: 'user_permissions_modal' %>
 
+<%= render partial: 'facility_permissions_modal' %>
+
+<%= render partial: 'user_modal' %>
 
 
 

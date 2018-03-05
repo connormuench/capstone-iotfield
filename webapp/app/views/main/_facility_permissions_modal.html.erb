@@ -1,9 +1,9 @@
 <!-- User Permissions Modal -->
-<div class="modal fade" id="userPermissionsModal" tabindex="-1" role="dialog" aria-labelledby="userPermissionsModalLabel" aria-hidden="true">
+<div class="modal fade" id="facilityPermissionsModal" tabindex="-1" role="dialog" aria-labelledby="facilityPermissionsModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="userPermissionsModalLabel">set NAME permissions</h5>
+        <h5 class="modal-title" id="facilityPermissionsModalLabel">set NAME permissions</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -11,14 +11,14 @@
       <div class="modal-body">
         <table class="table table-bordered">
           <tr>
-            <th scope="col">Facility</th>
+            <th scope="col">User</th>
             <th scope="col">Access Level</th>
           </tr>
-          <% Facility.all.each do |facility| %>
+          <% User.all.each do |user| %>
             <tr>
-              <td><%= facility.name%></td>
+              <td><%= user.name%></td>
               <td>
-                <div class="btn-group" role="group" aria-label="options" data-toggle="buttons" id="facility<%= facility.id %>">
+                <div class="btn-group" role="group" aria-label="options" data-toggle="buttons" id="user<%= user.id %>">
 
                   <label class="btn btn-primary">
                     <input type="radio" name="pointTypes" autocomplete="off" class="level-none"> None
