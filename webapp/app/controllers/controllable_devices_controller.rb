@@ -5,6 +5,7 @@ class ControllableDevicesController < PointsController
   before_action :set_facility, only: [:show, :create, :update, :destroy]
   before_action :authenticate_user!
   before_action only: [:create, :update, :destroy] { check_admin(facility_url(Facility.find(params[:facility_id]))) }
+  before_action only: [:update, :show] { authorize_user '/' }
 
   # GET /facilities/1/controllable_devices/1
   def show
@@ -119,5 +120,14 @@ class ControllableDevicesController < PointsController
 
     def rule_params(rule)
       rule.permit(:is_active, :expression, :action)
+    end
+
+    def authorize_user(url)
+      current_user.access_levels.each do |access_level|
+        if access_level.facility_id == @controllable_device.point.end_device.facility.id
+          return
+        end
+      end
+      redirect_to(url, alert: 'You are not authorized to access this page.')
     end
 end

@@ -1,6 +1,6 @@
 
 <span>
-  <h1>Admin Panel</h1>
+  <h1 class="mt-5">Admin Panel</h1>
 </span>
 
 <div class="row" style="max-height: 800px">
@@ -21,25 +21,23 @@
 
     <input type="text" class="form-control col-sm-6 mb-2" onkeyup="permissionSearch(this)">
 
-    <div class="admin-panel-column">
+    <div class="admin-panel-column mb-2">
 
       
-      <% User.all.each do |user| %>
+      <% User.all.sort_by { |user| user.username.downcase }.each do |user| %>
         <div class="card">
           <div class="card-header" role="tab">
             <div class="row mx-auto">
               <div class="col-xs ml-0 user-name">
-                <%= user.name%>
+                <%= user.username%>
               </div>
               <div class="col-xs ml-auto my-auto">
                 <div class="btn-group" role="group" aria-label="options">
-                  <button class="btn btn-warning btn-sm manip-button" title="Edit access level" type="button" data-toggle="modal" data-target="#userPermissionsModal" data-facility-access-levels="<%= @users[user.id].to_json %>" data-target-mod="user">
+                  <button class="btn btn-warning btn-sm manip-button" title="Edit access level" type="button" data-toggle="modal" data-target="#userPermissionsModal" data-facility-access-levels="<%= @users[user.id].to_json %>" data-username="<%= user.username %>" data-user-id="<%= user.id %>">
                     <%= ion_icon('unlocked') %>
                   </button>
                   <%= link_to ion_icon('information'), user_path(user), class: 'btn btn-primary btn-sm manip-button', title: 'View the user' %>
-                  <button class="btn btn-danger btn-sm manip-button" title="Edit access level" type="button" data-toggle="modal" data-target="#userPermissionsModal" data-facility-access-levels="<%= @users[user.id].to_json %>">
-                    <%= ion_icon('trash-b') %>
-                  </button>
+                  <%= link_to ion_icon('trash-b'), user_path(user), method: :delete, class: 'btn btn-danger btn-sm manip-button', title: 'Delete the user', data: { confirm: 'Are you sure?' } %>
                 </div>
               </div>
             </div>
@@ -63,10 +61,10 @@
     
     <input type="text" class="form-control col-sm-6 mb-2" onkeyup="permissionSearch(this)">
 
-    <div class="admin-panel-column">
+    <div class="admin-panel-column mb-2">
 
       
-      <% Facility.all.each do |facility| %>
+      <% Facility.all.sort_by { |facility| facility.name.downcase }.each do |facility| %>
         <div class="card">
           <div class="card-header" role="tab">
             <div class="row mx-auto">
@@ -75,14 +73,11 @@
               </div>
               <div class="col-xs ml-auto my-auto">
                 <div class="btn-group" role="group" aria-label="options">
-                  <button class="btn btn-warning btn-sm manip-button" title="Edit access level" type="button" data-toggle="modal" data-target="#facilityPermissionsModal" data-facility-access-levels="<%= @facilities[facility.id].to_json %>" data-target-mod="facility">
+                  <button class="btn btn-warning btn-sm manip-button" title="Edit access level" type="button" data-toggle="modal" data-target="#facilityPermissionsModal" data-facility-access-levels="<%= @facilities[facility.id].to_json %>" data-facility-name="<%= facility.name %>" data-facility-id="<%= facility.id %>">
                     <%= ion_icon('unlocked') %>
                   </button>
                   <%= link_to ion_icon('information'), facility_path(facility), class: 'btn btn-primary btn-sm manip-button', title: 'View the Facility' %>
-                  </button>
-                  <button class="btn btn-danger btn-sm manip-button" title="Edit access level" type="button" data-toggle="modal" data-target="#userPermissionsModal" data-facility-access-levels="<%= @facilities[facility.id].to_json %>">
-                    <%= ion_icon('trash-b') %>
-                  </button>
+                  <%= link_to ion_icon('trash-b'), facility_path(facility), method: :delete, class: 'btn btn-danger btn-sm manip-button', title: 'Delete the facility', data: { confirm: 'Are you sure?' } %>
                 </div>
               </div>
             </div>

@@ -2,9 +2,10 @@ class FacilitiesController < ApplicationController
   require 'pi_lists'
   require 'securerandom'
 
-  before_action :set_facility, only: [:show, :edit, :update, :destroy, :addable_points]
-  before_action only: [:create, :update, :destroy] { check_admin facilities_url }
+  before_action :set_facility, only: [:show, :edit, :update, :destroy, :addable_points, :set_permissions]
+  before_action only: [:create, :update, :destroy, :set_permissions] { check_admin facilities_url }
   before_action :authenticate_user!
+  before_action only: [:update, :show] { authorize_user facilities_url }
 
   # GET /facilities
   def index
@@ -96,6 +97,28 @@ class FacilitiesController < ApplicationController
     render json: points
   end
 
+  def set_permissions
+    users = params[:user]
+
+    access_levels = {}
+    @facility.access_levels.each do |access_level|
+      access_levels[access_level.user_id] = access_level
+    end
+
+    users.each do |user_s, access_level|
+      user = user_s.to_i
+      if access_level.downcase == 'none' && access_levels.include?(user)
+        access_levels[user].destroy
+      elsif access_levels.include?(user)
+        access_levels[user].level = access_level.titleize
+      elsif access_level.downcase != 'none' && !access_levels.include?(user)
+        @facility.access_levels.create(user_id: user, level: access_level.titleize)
+      end
+    end
+
+    redirect_to admin_panel_path, notice: 'User permissions were successfully updated.'
+  end
+
   private
     def set_facility
       @facility = Facility.find(params[:id])
@@ -104,5 +127,14 @@ class FacilitiesController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through
     def facility_params
       params.require(:facility).permit(:name, :description, :location)
+    end
+
+    def authorize_user(url)
+      current_user.access_levels.each do |access_level|
+        if access_level.facility_id == @facility.id
+          return
+        end
+      end
+      redirect_to(url, alert: 'You are not authorized to access this page.')
     end
 end

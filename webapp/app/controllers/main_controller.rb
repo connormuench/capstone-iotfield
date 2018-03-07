@@ -1,4 +1,7 @@
 class MainController < ApplicationController
+  before_action :authenticate_user!
+  before_action only: [:admin_panel] { check_admin '/' }
+
   def search
     @facilities = []
     @controllable_devices = []
@@ -106,7 +109,6 @@ class MainController < ApplicationController
     User.all.each do |user|
       @users[user.id] = {}
     end
-
 
     @facilities =  {}
     Facility.all.each do |facility|

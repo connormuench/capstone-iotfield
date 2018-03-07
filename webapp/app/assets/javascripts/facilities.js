@@ -165,18 +165,6 @@ function addRuleRow() {
     });
 }
 
-// Function to execute immediately before form submission
-function submitted() {
-    console.log($("form").serialize());
-    // Disable any hidden field if its corresponding checkbox is checked
-    $(".is-active-checkbox").each(function() {
-        if ($(this).find("input:checkbox")[0].checked) {
-            $(this).find("input:hidden").attr("disabled", true);
-        }
-    });
-    return true;
-}
-
 // Function to delete an associated rule row
 // deleteButton: the button that was clicked
 function deleteRuleRow(deleteButton) {
