@@ -1,0 +1,107 @@
+
+<span>
+  <h1>Admin Panel</h1>
+</span>
+
+<div class="row" style="max-height: 800px">
+  <div class="col-sm-6  border rounded-left"  >
+    <div class="row mb-2 mt-1 mx-auto">
+      <div class="col-xs my-auto">
+        <h2>
+          Users
+        </h2>
+      </div>
+
+      <div class="col-xs ml-3 my-auto pb-2">
+        <button class="btn btn-success btn-md manip-button" title="New user" type="button" data-toggle="modal" data-target="#userModal">
+                <%= ion_icon('plus') %>
+        </button>
+      </div>
+    </div>
+
+    <input type="text" class="form-control col-sm-6 mb-2" onkeyup="permissionSearch(this)">
+
+    <div class="admin-panel-column">
+
+      
+      <% User.all.each do |user| %>
+        <div class="card">
+          <div class="card-header" role="tab">
+            <div class="row mx-auto">
+              <div class="col-xs ml-0 user-name">
+                <%= user.name%>
+              </div>
+              <div class="col-xs ml-auto my-auto">
+                <div class="btn-group" role="group" aria-label="options">
+                  <button class="btn btn-warning btn-sm manip-button" title="Edit access level" type="button" data-toggle="modal" data-target="#userPermissionsModal" data-facility-access-levels="<%= @users[user.id].to_json %>" data-target-mod="user">
+                    <%= ion_icon('unlocked') %>
+                  </button>
+                  <%= link_to ion_icon('information'), user_path(user), class: 'btn btn-primary btn-sm manip-button', title: 'View the user' %>
+                  <button class="btn btn-danger btn-sm manip-button" title="Edit access level" type="button" data-toggle="modal" data-target="#userPermissionsModal" data-facility-access-levels="<%= @users[user.id].to_json %>">
+                    <%= ion_icon('trash-b') %>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+
+  
+  <div class="col-sm-6 border rounded-right" style="max-height: 70%">
+    <div class="row mb-2 mt-1 mx-auto">
+      <div class="col-xs my-auto">
+        <h2>
+          Facilities
+        </h2>
+      </div>
+    </div>
+
+    
+    <input type="text" class="form-control col-sm-6 mb-2" onkeyup="permissionSearch(this)">
+
+    <div class="admin-panel-column">
+
+      
+      <% Facility.all.each do |facility| %>
+        <div class="card">
+          <div class="card-header" role="tab">
+            <div class="row mx-auto">
+              <div class="col-xs ml-0 user-name">
+                <%= facility.name%>
+              </div>
+              <div class="col-xs ml-auto my-auto">
+                <div class="btn-group" role="group" aria-label="options">
+                  <button class="btn btn-warning btn-sm manip-button" title="Edit access level" type="button" data-toggle="modal" data-target="#facilityPermissionsModal" data-facility-access-levels="<%= @facilities[facility.id].to_json %>" data-target-mod="facility">
+                    <%= ion_icon('unlocked') %>
+                  </button>
+                  <%= link_to ion_icon('information'), facility_path(facility), class: 'btn btn-primary btn-sm manip-button', title: 'View the Facility' %>
+                  </button>
+                  <button class="btn btn-danger btn-sm manip-button" title="Edit access level" type="button" data-toggle="modal" data-target="#userPermissionsModal" data-facility-access-levels="<%= @facilities[facility.id].to_json %>">
+                    <%= ion_icon('trash-b') %>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+
+<%= render partial: 'user_permissions_modal' %>
+
+<%= render partial: 'facility_permissions_modal' %>
+
+<%= render partial: 'user_modal' %>
+
+
+
+
+
+

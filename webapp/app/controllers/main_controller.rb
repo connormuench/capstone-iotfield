@@ -100,4 +100,23 @@ class MainController < ApplicationController
       }
     end
   end
+
+  def admin_panel
+    @users = {}
+    User.all.each do |user|
+      @users[user.id] = {}
+    end
+
+
+    @facilities =  {}
+    Facility.all.each do |facility|
+      @facilities[facility.id] = {}
+    end
+
+    AccessLevel.all.each do |access_level|
+      @users[access_level.user_id][access_level.facility_id] = access_level.level
+      @facilities[access_level.facility_id][access_level.user_id] = access_level.level
+    end
+
+  end
 end

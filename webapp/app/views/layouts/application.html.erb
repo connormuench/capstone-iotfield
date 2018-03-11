@@ -53,7 +53,7 @@
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                   <%= link_to 'Profile', user_path(current_user.id), class: 'dropdown-item' %>
                   <% if current_user.is_admin %>
-                    <a class="dropdown-item" href="#">Admin Panel</a>
+                    <%= link_to 'Admin Panel', admin_panel_path, class: 'dropdown-item' %>
                   <% end %>
                   <div class="dropdown-divider"></div>
                   <%= link_to('Logout', destroy_user_session_path, method: :delete, class: "dropdown-item") %>

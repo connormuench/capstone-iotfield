@@ -4,12 +4,14 @@ Rails.application.routes.draw do
   get '/search', to: 'main#search', as: 'search'
   get '/visualization', to: 'main#visualization', as: 'visualization'
   get '/points', to: 'main#points', as: 'points'
+  get '/admin_panel', to: 'main#admin_panel', as: 'admin_panel'
 
   get '/facilities/addable', to: 'facilities#addable_facilities'
   get '/facilities/:id/addable', to: 'facilities#addable_points'
 
-  resources :users
+  get '/users/:id', to: 'users#show' 
 
+  resources :users
   resources :facilities do
     resources :sensors, :controllable_devices
   end

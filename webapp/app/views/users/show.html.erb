@@ -1,0 +1,61 @@
+<%= fields_for :user do |ff| %>
+  <div class="row mt-5 mx-auto">
+    <div class="col-xs my-auto">
+      <h1 class="mr-3">
+        <span class="form-toggle"><%= @user.name %></span>
+         <%= ff.text_field :name, class: 'form-toggle', value: @user.name, style: 'display: none;' %>
+      </h1>
+    </div>
+
+    <% if current_user.is_admin %>
+      <div class="col-xs my-auto">
+        <!-- Form submission button group -->
+        <div class="btn-group form-toggle" role="group" aria-label="Manipulate user" style="display: none;">
+          <a href="javascript:void(0)" class="btn btn-success" title="Save changes" ><%= ion_icon('checkmark') %></a>
+          <a href="javascript:void(0)" class="btn btn-danger" title="Discard changes" onclick="discardChanges($('#editSensorForm'))"><%= ion_icon('close') %></a>
+        </div>
+        <!-- Facility manipulation button group -->
+        <div class="btn-group form-toggle" role="group" aria-label="Manipulate user">
+           <%= link_to ion_icon('edit'), 'javascript:void(0)', class: 'btn btn-info manip-button', title: 'Edit the user', onclick: 'editAttributes()' %>
+          
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <div class="row my-2">
+    <div class="col-sm-2">
+      <b>ID</b>
+    </div>
+    <div class="col-sm-10">
+      <span class="form-toggle"><%= @user.id %></span>
+       <%= ff.text_field :location, class: 'form-control form-toggle', placeholder: 'Coordinates or address', value: @user.id, style: 'display:none;' %>
+    </div>
+  </div>
+  <div class="row my-2">
+    <div class="col-sm-2">
+      <b class="my-auto">Username</b>
+    </div>
+    <div class="col-sm-10">
+      <span> <%= @user.username %> </span>
+    </div>
+  </div>
+  <div class="row my-2">
+    <div class="col-sm-2">
+      <b>Email</b>
+    </div>
+    <div class="col-sm-10">
+      <span class="form-toggle"><%= @user.email %></span>
+       <%= ff.text_field :location, class: 'form-control form-toggle', placeholder: 'email', value: @user.email, style: 'display:none;' %>
+    </div>
+  </div>
+  
+  <div class="row my-2">
+    <div class="col-sm-2">
+      <b>Admin</b>
+    </div>
+    <div class="col-sm-10">
+      <span class="form-toggle"><%= @user.is_admin %></span>
+       <%= ff.text_area :description, class: 'form-control form-toggle', value:  @user.is_admin, style: 'display:none;' %>
+    </div>
+  </div>
+<% end %>
