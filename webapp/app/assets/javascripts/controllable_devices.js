@@ -4,3 +4,8 @@ $(document).ready(function() {
         $(this).find("input.form-control").focus();
     });
 });
+
+function setDevice() {
+    let textbox = $("#commandField");
+    $.get()
+}

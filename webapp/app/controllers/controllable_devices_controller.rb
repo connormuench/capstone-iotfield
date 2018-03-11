@@ -55,6 +55,8 @@ class ControllableDevicesController < PointsController
         raise ActiveRecord::Rollback
       end
 
+      new_rules = []
+
       # Add any rules that came with the request
       if params.key?(:rules_attributes)
         params[:rules_attributes].each do |rule|
@@ -63,12 +65,17 @@ class ControllableDevicesController < PointsController
             render :new
             raise ActiveRecord::Rollback
           end
+          new_rules.push(new_rule)
         end
       end
 
       # Ensure the corresponding facility is connected before sending the 'add-point' command
       if PiLists.instance.accepted.key?(@facility.pi_id)
-        PiLists.instance.accepted[@facility.pi_id][:ws].send({action: 'add-point', type: 'controllable_device', id: params[:remote_id]}.to_json)
+        ws = PiLists.instance.accepted[@facility.pi_id][:ws]
+        ws.send({action: 'add-point', type: 'controllable_device', id: params[:remote_id]}.to_json)
+        new_rules.each do |new_rule|
+          ws.send({action: 'add-rule', rule: {expression: new_rule.expression, action: new_rule.action, is_active: new_rule.is_active, server_id: new_rule.id}, point_id: params[:remote_id]})
+        end
       end
 
       # No failures if we got to this point, show the controllable device's page
@@ -83,11 +90,15 @@ class ControllableDevicesController < PointsController
       # Add/update any rules that came with the request
       if params.key?(:rules_attributes)
         modified_rules = []
+        new_rules = []
+        updated_rules = []
+        deleted_rules = []
         params[:rules_attributes].each do |rule|
           if rule.key?(:id)
             old_rule = Rule.find(rule[:id])
             old_rule.update(rule_params(rule))
             modified_rules.push(old_rule)
+            updated_rules.push({expression: old_rule.expression, action: old_rule.action, is_active: old_rule.is_active, server_id: old_rule.id})
           else
             new_rule = @controllable_device.rules.new(rule_params(rule))
             modified_rules.push(new_rule)
@@ -95,6 +106,7 @@ class ControllableDevicesController < PointsController
               render :new
               raise ActiveRecord::Rollback
             end
+            new_rules.push({expression: new_rule.expression, action: new_rule.action, is_active: new_rule.is_active, server_id: new_rule.id})
           end
         end
         @controllable_device.rules.each do |rule|
@@ -106,14 +118,38 @@ class ControllableDevicesController < PointsController
             end
           end
           if !found
+            deleted_rules.push({ server_id: rule.id })
             rule.destroy
           end
         end
       else
+        deleted_rules.concat(@controllable_device.rules.map { |rule| {server_id: rule.id} })
         @controllable_device.rules.destroy_all
       end
 
       if @controllable_device.point.update(point_params)
+        # Ensure the corresponding facility is connected before sending the 'add-point' command
+        if PiLists.instance.accepted.key?(@facility.pi_id)
+          ws = PiLists.instance.accepted[@facility.pi_id][:ws]
+          packet = {action: 'add-rule', point_id: @controllable_device.point.end_device.address + ':' + @controllable_device.point.remote_id.to_s}
+          new_rules.each do |rule|
+            packet[:rule] = rule
+            ws.send(packet.to_json)
+          end
+          
+          packet[:action] = 'edit-rule'
+          updated_rules.each do |rule|
+            packet[:rule] = rule
+            ws.send(packet.to_json)
+          end
+
+          packet = {action: 'remove-rule'}
+          deleted_rules.each do |rule|
+            packet[:server_id] = rule[:server_id]
+            ws.send(packet.to_json)
+          end
+        end
+
         redirect_to [@facility, @controllable_device], notice: 'Controllable device was successfully updated.'
       else
         render :edit

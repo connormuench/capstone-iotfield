@@ -13,7 +13,7 @@ class SensorsController < PointsController
     if records.count > 0
       @unit = records.first.unit
     else
-      @unit = 'unitless'
+      @unit = 'dimensionless'
     end
   end
 

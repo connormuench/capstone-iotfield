@@ -35,15 +35,15 @@ Thread.new {
               facility.network_address = ws.remote_ip
               facility.save
               facility.end_devices.each do |end_device|
-                points[:sensor] = []
-                points[:controllable_device] = []
+                points[:sensor] = {}
+                points[:controllable_device] = {}
                 end_device.sensors.each do |sensor|
-                  points[:sensor].push(end_device.address + ':' + sensor.point.remote_id.to_s)
+                  points[:sensor][end_device.address + ':' + sensor.point.remote_id.to_s] = 'n/a'
                 end
                 end_device.controllable_devices.each do |controllable_device|
                   remote_id = end_device.address + ':' + controllable_device.point.remote_id.to_s
-                  points[:controllable_device].push(remote_id)
-                  rules[remote_id] = controllable_device.rules.map { |rule| {expression: rule.expression, action: rule.action, is_active: rule.is_active} }
+                  points[:controllable_device][remote_id] = controllable_device.mode.downcase
+                  rules[remote_id] = controllable_device.rules.map { |rule| {expression: rule.expression, action: rule.action, is_active: rule.is_active, server_id: rule.id} }
                 end
               end
             end
