@@ -138,3 +138,14 @@ function discardChanges(form) {
 function editAttributes() {
     $(".form-toggle").toggle();
 }
+
+// Function to execute immediately before form submission
+function submitted() {
+    // Disable any hidden field if its corresponding checkbox is checked
+    $(".is-active-checkbox").each(function() {
+        if ($(this).find("input:checkbox")[0].checked) {
+            $(this).find("input:hidden").attr("disabled", true);
+        }
+    });
+    return true;
+}

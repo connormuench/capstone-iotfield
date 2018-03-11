@@ -9,37 +9,39 @@
         </button>
       </div>
       <div class="modal-body">
-        <table class="table table-bordered">
-          <tr>
-            <th scope="col">User</th>
-            <th scope="col">Access Level</th>
-          </tr>
-          <% User.all.each do |user| %>
+        <%= form_for :facility, method: :post, html: { id: 'setFacilityPermissionsForm' } do |f| %>
+          <table class="table table-bordered">
             <tr>
-              <td><%= user.name%></td>
-              <td>
-                <div class="btn-group" role="group" aria-label="options" data-toggle="buttons" id="user<%= user.id %>">
-
-                  <label class="btn btn-primary">
-                    <input type="radio" name="pointTypes" autocomplete="off" class="level-none"> None
-                  </label>
-
-                  <label class="btn btn-primary">
-                    <input type="radio" name="pointTypes" autocomplete="off" class="level-monitor"> Monitor
-                  </label>
-
-                  <label class="btn btn-primary">
-                    <input type="radio" name="pointTypes" autocomplete="off" class="level-controller"> Controller
-                  </label>
-                </div>
-              </td>
+              <th scope="col">User</th>
+              <th scope="col">Access Level</th>
             </tr>
-          <% end %>
-        </table>
+            <% User.all.sort_by { |user| user.username.downcase }.each do |user| %>
+              <tr>
+                <td><%= user.username%></td>
+                <td>
+                  <div class="btn-group" role="group" aria-label="options" data-toggle="buttons" id="user<%= user.id %>">
+
+                    <label class="btn btn-primary">
+                      <input type="radio" name="user[<%= user.id %>]" autocomplete="off" class="level-none" value="None"> None
+                    </label>
+
+                    <label class="btn btn-primary">
+                      <input type="radio" name="user[<%= user.id %>]" autocomplete="off" class="level-monitor" value="Monitor"> Monitor
+                    </label>
+
+                    <label class="btn btn-primary">
+                      <input type="radio" name="user[<%= user.id %>]" autocomplete="off" class="level-controller" value="Controller"> Controller
+                    </label>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </table>
+        <% end %>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-success" onclick="$('#addPointForm').submit()">Save</button>
+        <button type="button" class="btn btn-success" onclick="$('#setFacilityPermissionsForm').submit()">Save</button>
       </div>
     </div>
   </div>
