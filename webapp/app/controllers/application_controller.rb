@@ -21,4 +21,17 @@ class ApplicationController < ActionController::Base
     end
     return data
   end
+  
+  def available_points
+    points = {}
+    current_user.facilities.each do |facility|
+      facility.points.each do |point|
+        if not points.key?(facility.id)
+          points[facility.id] = []
+        end
+        points[facility.id].push('{' + point.name + '|' + point.end_device.address + ':' + point.remote_id.to_s + '}')
+      end
+    end
+    return points
+  end
 end

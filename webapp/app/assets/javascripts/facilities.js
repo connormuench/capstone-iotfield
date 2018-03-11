@@ -101,6 +101,7 @@ $(document).ready(function() {
 // Adds a row to the automation rules section of #addPointModal
 function addRuleRow() {
     var row = $("#rule-rows").append($("<tr>")
+        .attr("class", "delete-on-discard")
         .append($("<td>")
             .attr("class", "text-center align-middle")
             .append($("<div>")
@@ -121,7 +122,7 @@ function addRuleRow() {
                     .attr("type", "text")
                     .attr("name", "rules_attributes[][expression]"))
                 .append($("<div>")      // Sensor autocomplete button
-                    .attr("class", "input-group-btn")
+                    .attr("class", "input-group-btn expression-button")
                     .on("shown.bs.dropdown", function() {
                         $(this).find("input.form-control").focus();
                     })

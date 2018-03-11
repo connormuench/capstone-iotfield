@@ -9,11 +9,13 @@ class FacilitiesController < ApplicationController
   # GET /facilities
   def index
     @facilities = current_user.facilities
+    @available_points = available_points
     puts "Not accepted: #{PiLists.instance.not_accepted.size}"
   end
 
   # GET /facilities/1
   def show
+    @available_points = available_points
     @controllable_devices = []
     @sensors = []
 

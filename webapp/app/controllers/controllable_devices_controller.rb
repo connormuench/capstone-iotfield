@@ -14,6 +14,7 @@ class ControllableDevicesController < PointsController
       @unit = @controllable_device.point.records.first.unit
     end
     @access_level = current_user.access_levels.where(facility_id: @facility.id).first
+    @available_points = available_points
   end
 
   # POST /facilities/1/controllable_devices
@@ -77,11 +78,46 @@ class ControllableDevicesController < PointsController
 
   # PATCH/PUT /facilities/1/controllable_devices/1
   def update
-    puts "hi bob"
-    if @controllable_device.point.update(point_params)
-      redirect_to [@facility, @controllable_device], notice: 'Controllable device was successfully updated.'
-    else
-      render :edit
+    # Establish a rollback point in case anything fails to save
+    ActiveRecord::Base.transaction do
+      # Add/update any rules that came with the request
+      if params.key?(:rules_attributes)
+        modified_rules = []
+        params[:rules_attributes].each do |rule|
+          if rule.key?(:id)
+            old_rule = Rule.find(rule[:id])
+            old_rule.update(rule_params(rule))
+            modified_rules.push(old_rule)
+          else
+            new_rule = @controllable_device.rules.new(rule_params(rule))
+            modified_rules.push(new_rule)
+            if not new_rule.save
+              render :new
+              raise ActiveRecord::Rollback
+            end
+          end
+        end
+        @controllable_device.rules.each do |rule|
+          found = false
+          modified_rules.each do |modified_rule|
+            if modified_rule.id == rule.id
+              found = true
+              break
+            end
+          end
+          if !found
+            rule.destroy
+          end
+        end
+      else
+        @controllable_device.rules.destroy_all
+      end
+
+      if @controllable_device.point.update(point_params)
+        redirect_to [@facility, @controllable_device], notice: 'Controllable device was successfully updated.'
+      else
+        render :edit
+      end
     end
   end
 

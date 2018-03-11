@@ -63,5 +63,6 @@ gem 'font-awesome-rails'
 gem 'em-websocket'
 
 gem 'chartkick'
+gem 'ruby-units'
 
 gem 'concurrent-ruby', require: 'concurrent'

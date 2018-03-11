@@ -130,7 +130,8 @@ function hideSearchDropdown() {
 // Function to reset the form and toggle the form fields to read-only attributes
 function discardChanges(form) {
     form.trigger("reset");
-    $(".form-toggle").toggle();   
+    $(".form-toggle").toggle();
+    $(".delete-on-discard").remove();
 }
 
 // Function to toggle the attributes to become editable form fields

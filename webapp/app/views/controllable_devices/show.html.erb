@@ -12,10 +12,10 @@
 
   <div class="btn-group mt-2" data-toggle="buttons">
     <label class="btn btn-primary active">
-      <input type="radio" id="sensorOption" autocomplete="off" checked> MANUAL
+      <input type="radio" id="manualOption" autocomplete="off"<%= ' checked' if @controllable_device.mode.downcase == 'manual' %>> MANUAL
     </label>
     <label class="btn btn-primary">
-      <input type="radio" id="controllableDeviceOption" autocomplete="off"> AUTO
+      <input type="radio" id="autoOption" autocomplete="off"<%= ' checked' if @controllable_device.mode.downcase == 'auto' %> disabled> AUTO
     </label>
   </div>
 
@@ -24,10 +24,10 @@
       <h5>Automation Rules</h5>
     </div>
     <div class="col-xs ml-3 my-auto pb-2">
-      <button type="button" class="btn btn-success btn-sm form-toggle" onclick="addRuleRow()" style= "display: none;"><%= ion_icon "plus" %></button>
+      <button type="button" class="btn btn-success btn-sm form-toggle" onclick="addRuleRow()" style= "display: none;"><%= ion_icon 'plus' %></button>
     </div>
   </div>
-  <table class="table table-bordered table-hover table-sm" id="rules-table" >
+  <table class="table table-bordered table-hover table-sm" id="rules-table" data-points="<%= @available_points.to_json %>">
     <thead>
       <tr>
         <th scope="col">Active</th>
@@ -38,16 +38,17 @@
         <% end %>
       </tr>
     </thead>
-    <tbody id="rule-rows">
+    <tbody id="rule-rows" data-facility-id="<%= @facility.id %>">
       <% @controllable_device.rules.each do |rule| %>
         <tr>
+          <input type="hidden" name="rules_attributes[][id]" value="<%= rule.id %>">
           <td class="text-center align-middle">
             <div class="is-active-checkbox form-toggle">
               <input class="my-auto mx-auto" type="checkbox" disabled<%= ' checked' if rule.is_active %>>
             </div>
             <div class="is-active-checkbox form-toggle" style="display: none;">
-              <input type="hidden" name="rules_attributes[<%= rule.id %>][is_active]" value="0">
-              <input class="my-auto mx-auto" type="checkbox" name="rules_attributes[<%= rule.id %>][is_active]" <%= ' checked' if rule.is_active %>>
+              <input type="hidden" name="rules_attributes[][is_active]" value="0">
+              <input class="my-auto mx-auto" type="checkbox" name="rules_attributes[][is_active]" <%= ' checked' if rule.is_active %>>
             </div>
           </td>
           <td>
@@ -59,9 +60,14 @@
                   <span class="ion-radio-waves"></span>
                 </button>
                 <div class="dropdown-menu dropdown-menu-right pointDropdown">
-                  <span class="dropdown_item">
+                  <span class="dropdown-item">
                     <input class="form-control mx-auto" type="text" onkeyup="updateList(this)" style="width: 100%;">
                   </span>
+                  <% if @available_points.key?(@facility.id) %>
+                    <% @available_points[@facility.id].each do |point_s| %>
+                      <a href="#" class="dropdown-item" onclick="return sensorClicked(this)"><%= point_s %></a>
+                    <% end %>
+                  <% end %>
                 </div>
               </div>
             </div>

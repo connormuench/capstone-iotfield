@@ -20,9 +20,19 @@ def handle_message(msg, ws):
     if 'action' in params:
         # First returned message from the server for verifying the Pi's ID
         if params['action'] == 'id-verification':
-            if 'status' in params and params['status'].lower() == 'new':
+            if params['status'].lower() == 'new':
                 ws.id = params['id']
                 print('id: ' + ws.id)
+            elif params['status'].lower() == 'ok':
+                for point_type in params['points']:
+                    if not point_type in points_joined:
+                        points_joined[point_type] = {}
+                    if point_type in points_waiting:
+                        for point in params['points'][point_type]:
+                            points_joined[point_type][point] = ''
+                            if point in points_waiting[point_type]:
+                                points_joined[point_type][point] = points_waiting[point_type][point]
+                                del points_waiting[point_type][point]
         # Server can refuse the connection for any reason
         if params['action'] == 'connection-refused':
             print('Connection was refused by the server: ' + params['status'])
@@ -70,8 +80,8 @@ class PiClient(WebSocketClient):
         pass
 
     def received_message(self, m):
-        handle_message(str(m), self)
         print(m)
+        handle_message(str(m), self)
 
 def sendData(ws):
     if 'sensor' in points_joined:

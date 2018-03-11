@@ -23,6 +23,8 @@ Thread.new {
         if handshake.headers['password'] == ENV['FACILITY_ACCESS_PASSWORD']
           # If the Pi provided its own ID, check to see if it is already used by another
           if handshake.headers.key?('id') && !pi_lists.not_accepted.key?(handshake.headers['id']) && !pi_lists.accepted.key?(handshake.headers['id'])
+            points = {}
+            rules = {}
             if Facility.where(pi_id: handshake.headers['id']).count == 0
               # No match in the DB, so add it to the list of unaccepted Pis
               pi_lists.not_accepted[handshake.headers['id']] = {ws: ws, hs: handshake}
@@ -32,8 +34,20 @@ Thread.new {
               facility = Facility.where(pi_id: handshake.headers['id'])[0]
               facility.network_address = ws.remote_ip
               facility.save
+              facility.end_devices.each do |end_device|
+                points[:sensor] = []
+                points[:controllable_device] = []
+                end_device.sensors.each do |sensor|
+                  points[:sensor].push(end_device.address + ':' + sensor.point.remote_id.to_s)
+                end
+                end_device.controllable_devices.each do |controllable_device|
+                  remote_id = end_device.address + ':' + controllable_device.point.remote_id.to_s
+                  points[:controllable_device].push(remote_id)
+                  rules[remote_id] = controllable_device.rules.map { |rule| {expression: rule.expression, action: rule.action, is_active: rule.is_active} }
+                end
+              end
             end
-            ws.send({action: 'id-verification', status: 'OK'}.to_json)
+            ws.send({action: 'id-verification', status: 'OK', points: points, rules: rules}.to_json)
           else
             # Pi either didn't provide its own or the one it provided is already in use, so generate a new, unique ID
             pi_id = nil
