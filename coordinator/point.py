@@ -6,10 +6,13 @@ class Point():
         kwargs: list of properties for the object. Can pass in a dictionary using double-splat
         """
         
-        self.long_address = kwargs['long_address']
+        self.point_id = str(kwargs['point_id'])
+        self.name = str(kwargs['name'])
+        self.point_type = str(kwargs['point_type'])
+        self.mode = str(kwargs.get('mode', 'manual'))
         
         # ID is optional, so use get() instead
-        self.point_id = kwargs.get('rowid')
+        self.rowid = kwargs.get('rowid')
         
     
     def __repr__(self):
@@ -17,4 +20,4 @@ class Point():
         Returns a string representation of the Point object
         """
         
-        return 'Point{{id={}, long_address=\'{}\'}}'.format(self.point_id, self.long_address)
+        return 'Point{{id={}, point_id=\'{}\', name=\'{}\', point_type=\'{}\', mode=\'{}\'}}'.format(self.rowid, self.point_id, self.name, self.point_type, self.mode)

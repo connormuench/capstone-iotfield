@@ -20,9 +20,9 @@ cur = conn.cursor()
 """
 TABLE points
 
-long_address: the serial number of the XBee associated with the point
+point_id: the serial number of the XBee associated with the point
 """
-cur.execute("CREATE TABLE points(point_id TEXT UNIQUE);")
+cur.execute("CREATE TABLE points(point_id TEXT UNIQUE, name TEXT, point_type TEXT, mode TEXT);")
 
 """
 TABLE rules
@@ -31,7 +31,7 @@ expression: a cexprtk-compatible conditional expression. Long addresses of Point
 target_device: the long address of the device to manipulate
 action: the action to perform when expression is true
 """
-cur.execute("CREATE TABLE rules(expression TEXT, target_device TEXT, action TEXT);")
+cur.execute("CREATE TABLE rules(expression TEXT, target_device TEXT, action TEXT, is_active TEXT, server_id INTEGER UNIQUE);")
 
 """
 TABLE rule_point

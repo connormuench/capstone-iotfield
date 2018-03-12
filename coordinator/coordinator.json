@@ -1,1 +1,14 @@
-{"xbee-baudrate": 115200, "name": "Moon Facility", "local-db-path": "coordinator.db", "webserver_password": "popeye", "server-ip": "127.0.0.1", "xbee-reset-rpi-bcm-pin": 4, "server-port": 3000, "webserver_address": "ws://10.13.189.208:3002", "xbee-cts-rpi-bcm-pin": 16, "xbee-port": "/dev/ttyAMA0", "pi_id": "569057a4355b15b7"}
+{
+    "local-db-path": "coordinator.db",
+    "name": "Moon Facility",
+    "pi_id": "0143b06f4568595d",
+    "reconnect-interval-seconds": 5,
+    "server-ip": "127.0.0.1",
+    "server-port": 3000,
+    "webserver-address": "ws://174.0.236.126:3002",
+    "webserver-password": "popeye",
+    "xbee-baudrate": 115200,
+    "xbee-cts-rpi-bcm-pin": 16,
+    "xbee-port": "/dev/ttyAMA0",
+    "xbee-reset-rpi-bcm-pin": 8
+}

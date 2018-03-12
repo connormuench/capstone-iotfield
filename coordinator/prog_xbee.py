@@ -20,7 +20,7 @@ class ProgrammableXBee(ZigBee):
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.__reset_pin, GPIO.OUT)
         GPIO.setup(self.__cts_pin, GPIO.IN)
-        GPIO.output(self.__reset_pin, GPIO.HIGH)
+        GPIO.output(self.__reset_pin, GPIO.LOW)
         
         if port == 'auto':
             usb_devices = glob.glob('/dev/ttyUSB*')
@@ -47,20 +47,20 @@ class ProgrammableXBee(ZigBee):
         port = self.__serial_port
         
         # CTS pin is active low; wait for it to go low so we know the device is in bypass mode
-        while GPIO.input(self.__cts_pin):
-            print('Putting XBee in Bypass mode...')
-            
-            # Steps for putting XBee in bypass mode:
-            # 1. Set BREAK, reset the device, unset BREAK
-            # 2. Press Enter to enter the bootloader
-            # 3. Press B to enter bypass mode
-            port.break_condition = True
-            self.reset()
-            port.break_condition = False
-            port.write(b'\x0d\x0d\x0d')
-            time.sleep(0.1)
-            port.write(b'\x42\x42\x42')
-            time.sleep(0.1)
+        #for i in range(0, 10):
+        print('Putting XBee in Bypass mode...')
+        
+        # Steps for putting XBee in bypass mode:
+        # 1. Set BREAK, reset the device, unset BREAK
+        # 2. Press Enter to enter the bootloader
+        # 3. Press B to enter bypass mode
+        port.break_condition = True
+        self.reset()
+        port.break_condition = False
+        port.write(b'\x0d\x0d\x0d')
+        time.sleep(0.1)
+        port.write(b'\x62\x62\x62')
+        time.sleep(0.1)
         
         
     def reset(self):
@@ -68,9 +68,9 @@ class ProgrammableXBee(ZigBee):
         Resets the device using the GPIO pin specified in the config file
         """
         
-        GPIO.output(self.__reset_pin, GPIO.LOW)
-        time.sleep(0.01)
         GPIO.output(self.__reset_pin, GPIO.HIGH)
+        time.sleep(0.1)
+        GPIO.output(self.__reset_pin, GPIO.LOW)
         
         
     def halt(self):
