@@ -7,8 +7,8 @@ class PiLists
   attr_accessor :accepted, :not_accepted, :points
 
   def initialize()
-    @accepted = Concurrent::Map.new
-    @not_accepted = Concurrent::Map.new
-    @points = Concurrent::Map.new
+    @accepted = Concurrent::Hash.new
+    @not_accepted = Concurrent::Hash.new
+    @points = Concurrent::Hash.new
   end
 end

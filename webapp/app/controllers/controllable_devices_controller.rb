@@ -1,14 +1,15 @@
 class ControllableDevicesController < PointsController
   require 'pi_lists'
 
-  before_action :set_controllable_device, only: [:show, :update, :destroy]
-  before_action :set_facility, only: [:show, :create, :update, :destroy]
+  before_action :set_controllable_device, only: [:show, :update, :destroy, :send_command, :set_mode]
+  before_action :set_facility, only: [:show, :create, :update, :destroy, :send_command, :set_mode]
   before_action :authenticate_user!
   before_action only: [:create, :update, :destroy] { check_admin(facility_url(Facility.find(params[:facility_id]))) }
-  before_action only: [:update, :show] { authorize_user '/' }
+  before_action only: [:update, :show, :send_command, :set_mode] { authorize_user '/' }
 
   # GET /facilities/1/controllable_devices/1
   def show
+    puts('debug2')
     records = @controllable_device.point.records
     @data = chart_data_from_points [@controllable_device.point]
     if records.count > 0
@@ -16,6 +17,7 @@ class ControllableDevicesController < PointsController
     end
     @access_level = current_user.access_levels.where(facility_id: @facility.id).first
     @available_points = available_points
+    puts('debug3')
   end
 
   # POST /facilities/1/controllable_devices
@@ -129,7 +131,7 @@ class ControllableDevicesController < PointsController
       end
 
       if @controllable_device.point.update(point_params)
-        # Ensure the corresponding facility is connected before sending the 'add-point' command
+        # Ensure the corresponding facility is connected before sending the commands for adding, editing, and removing rules
         if PiLists.instance.accepted.key?(@facility.pi_id)
           ws = PiLists.instance.accepted[@facility.pi_id][:ws]
           packet = {action: 'add-rule', point_id: @controllable_device.point.end_device.address + ':' + @controllable_device.point.remote_id.to_s}
@@ -173,6 +175,27 @@ class ControllableDevicesController < PointsController
 
     @controllable_device.destroy
     redirect_to facility_url(@facility), notice: 'Controllable device was successfully destroyed.'
+  end
+
+  def set_mode
+    if !@controllable_device.update(mode: params['mode'])
+      return
+    end
+    if PiLists.instance.accepted.key?(@facility.pi_id)
+      remote_id = @controllable_device.point.end_device.address + ':' + @controllable_device.point.remote_id.to_s
+      PiLists.instance.accepted[@facility.pi_id][:ws].send({action: 'set-mode', id: remote_id, mode: params['mode'].downcase}.to_json)
+    end
+  end
+
+  def send_command
+    if @controllable_device.mode.downcase != 'manual'
+      return
+    end
+
+    if PiLists.instance.accepted.key?(@facility.pi_id)
+      remote_id = @controllable_device.point.end_device.address + ':' + @controllable_device.point.remote_id.to_s
+      PiLists.instance.accepted[@facility.pi_id][:ws].send({action: 'control-device', id: remote_id, command: params['command']}.to_json)
+    end
   end
 
   private

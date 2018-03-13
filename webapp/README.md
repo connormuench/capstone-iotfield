@@ -2,9 +2,9 @@
 
 ## Component Version Info
 
-__Ruby:__ 2.3
+__Ruby:__ 2.3.3
 
-__Rails:__ 5.1
+__Rails:__ 5.1.4
 
 __Postgres:__ 10.1
 

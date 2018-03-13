@@ -9,6 +9,9 @@ Rails.application.routes.draw do
   get '/facilities/addable', to: 'facilities#addable_facilities'
   get '/facilities/:id/addable', to: 'facilities#addable_points'
 
+  post '/facilities/:facility_id/controllable_devices/:id/set_mode', to: 'controllable_devices#set_mode', as: 'set_controllable_device_mode'
+  post '/facilities/:facility_id/controllable_devices/:id/send_command', to: 'controllable_devices#send_command', as: 'send_controllable_device_command'
+
   resources :users
   resources :facilities do
     resources :sensors, :controllable_devices

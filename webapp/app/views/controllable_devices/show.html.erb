@@ -1,23 +1,23 @@
 <%= form_for [@facility, @controllable_device], method: :patch, html: {id: 'editForm', onsubmit: 'submitted()'} do |f| %>
   <%= render partial: 'points/show.html.erb', locals: { point: @controllable_device.point, point_type: "controllable device", path: facility_controllable_device_path(@facility.id, @controllable_device) } %>
 
-  <div class="btn-group mt-2" data-toggle="buttons">
-    <label class="btn btn-primary active">
-      <input type="radio" name="mode_toggle" id="manualOption" autocomplete="off"<%= ' checked' if @controllable_device.mode.downcase == 'manual' %>> MANUAL
+  <div class="btn-group mt-2" data-toggle="buttons" data-target-url="<%= set_controllable_device_mode_path(@facility.id, @controllable_device.id) %>">
+    <label class="btn btn-primary device-mode<%= ' active' if @controllable_device.mode.downcase == 'manual' %>">
+      <input type="radio" name="mode_toggle" id="manualOption" autocomplete="off" value="manual"<%= ' checked' if @controllable_device.mode.downcase == 'manual' %>> MANUAL
     </label>
-    <label class="btn btn-primary">
-      <input type="radio" name="mode_toggle" id="autoOption" autocomplete="off"<%= ' checked' if @controllable_device.mode.downcase == 'auto' %>> AUTO
+    <label class="btn btn-primary device-mode<%= ' active' if @controllable_device.mode.downcase == 'auto' %>">
+      <input type="radio" name="mode_toggle" id="autoOption" autocomplete="off" value="auto"<%= ' checked' if @controllable_device.mode.downcase == 'auto' %>> AUTO
     </label>
   </div>
 
-  <div class="row my-2"<%= ' style="display: none;"' if @controllable_device.mode.downcase != 'manual' %>>
+  <div class="row my-2"<%= ' style="display: none;"'.html_safe if @controllable_device.mode.downcase != 'manual' %> id="commandSection">
     <div class="col-sm-2 my-auto">
       <b>Set device to</b>
     </div>
     <div class="col-sm-3">
       <div class="row">
         <input class="form-control col-sm-9" type="text" id="commandField">
-        <button type="button" class="btn btn-primary ml-2 col">Set</button>
+        <button type="button" class="btn btn-primary ml-2 col" onclick="setDevice(this)" data-target-url="<%= send_controllable_device_command_path(@facility.id, @controllable_device.id) %>">Set</button>
       </div>
     </div>
   </div>
@@ -90,9 +90,10 @@
       <% end %>
     </tbody>
   </table>
-
+<% puts('debug4') %>
 <% end %>
 
 <%= render partial: 'points/filter_chart.html.erb', locals: { select_points: false } %>
 
 <%= render partial: 'points/show_chart.html.erb', locals: {point_id: @controllable_device.point.id} %>
+<% puts('debug5') %>

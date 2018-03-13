@@ -63,7 +63,7 @@ class FacilitiesController < ApplicationController
     pi_id = @facility.pi_id
     @facility.destroy
 
-    # Move the Pi to the accepted map if it's connected
+    # Move the Pi to the not_accepted map if it's connected
     if PiLists.instance.accepted.key?(pi_id)
       PiLists.instance.not_accepted[pi_id] = PiLists.instance.accepted[pi_id]
       PiLists.instance.accepted.delete(pi_id)
