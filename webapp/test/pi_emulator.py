@@ -1,6 +1,5 @@
 from ws4py.client.threadedclient import WebSocketClient
 import json, threading, random, time
-
 points_waiting = {
     'sensor': {'12345678:0': 'Temperature sensor', '12345678:1': 'Water level sensor', '87654321:0': 'Water level sensor'},
     'controllable_device': {'87654321:1': 'Water pump', '12345679:0': 'Water valve'}
@@ -15,13 +14,25 @@ def handle_message(msg, ws):
     msg: the message received
     ws: the Websocket object
     '''
+
+
     params = json.loads(msg)
     if 'action' in params:
         # First returned message from the server for verifying the Pi's ID
         if params['action'] == 'id-verification':
-            if 'status' in params and params['status'].lower() == 'new':
+            if params['status'].lower() == 'new':
                 ws.id = params['id']
                 print('id: ' + ws.id)
+            elif params['status'].lower() == 'ok':
+                for point_type in params['points']:
+                    if not point_type in points_joined:
+                        points_joined[point_type] = {}
+                    if point_type in points_waiting:
+                        for point in params['points'][point_type]:
+                            points_joined[point_type][point] = ''
+                            if point in points_waiting[point_type]:
+                                points_joined[point_type][point] = points_waiting[point_type][point]
+                                del points_waiting[point_type][point]
         # Server can refuse the connection for any reason
         if params['action'] == 'connection-refused':
             print('Connection was refused by the server: ' + params['status'])
@@ -69,13 +80,13 @@ class PiClient(WebSocketClient):
         pass
 
     def received_message(self, m):
-        handle_message(str(m), self)
         print(m)
+        handle_message(str(m), self)
 
 def sendData(ws):
     if 'sensor' in points_joined:
         for sensor in points_joined['sensor']:
-            ws.send(json.dumps({'action': 'record', 'address': sensor['id'].split(':')[0], 'remote_id': int(sensor['id'].split(':')[1]), 'value': random.randint(20, 25), 'unit': 'degC'}))
+            ws.send(json.dumps({'action': 'record', 'address': sensor.split(':')[0], 'remote_id': int(sensor.split(':')[1]), 'value': random.randint(20,25), 'unit': 'degC'}))
 
 if __name__ == '__main__':
     random.seed()
@@ -87,7 +98,7 @@ if __name__ == '__main__':
         t.start()
         while t.isAlive():
             t.join(1)
-            time.sleep(2)
+            time.sleep(5)
             sendData(ws)
     except KeyboardInterrupt:
         ws.close()

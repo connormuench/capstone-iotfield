@@ -13,13 +13,13 @@
         <!-- Form submission button group -->
         <div class="btn-group form-toggle" role="group" aria-label="Manipulate facility" style="display: none;">
           <a href="javascript:void(0)" class="btn btn-success" title="Save changes" onclick="$('#editFacilityForm').submit()"><%= ion_icon('checkmark') %></a>
-          <a href="javascript:void(0)" class="btn btn-danger" title="Discard changes" onclick="discardChanges()"><%= ion_icon('close') %></a>
+          <a href="javascript:void(0)" class="btn btn-danger" title="Discard changes" onclick="discardChanges($('#editFacilityForm'))"><%= ion_icon('close') %></a>
         </div>
         <!-- Facility manipulation button group -->
         <div class="btn-group form-toggle" role="group" aria-label="Manipulate facility">
-          <a href="javascript:void(0)" class="btn btn-success" data-toggle="modal" data-target="#addPointModal" data-facility-id="<%= @facility.id %>" title="Add a new point"><%= ion_icon('plus') %></a>
-          <%= link_to ion_icon('edit'), 'javascript:void(0)', class: 'btn btn-info facility-manip', title: 'Edit the facility', onclick: 'editFacility()' %>
-          <%= link_to ion_icon('trash-b'), facility_path(@facility), method: :delete, class: 'btn btn-danger facility-manip', title: 'Delete the facility', data: { confirm: 'Are you sure?' } %>
+          <a href="javascript:void(0)" class="btn btn-success manip-button" data-toggle="modal" data-target="#addPointModal" data-facility-id="<%= @facility.id %>" title="Add a new point"><%= ion_icon('plus') %></a>
+          <%= link_to ion_icon('edit'), 'javascript:void(0)', class: 'btn btn-info manip-button', title: 'Edit the facility', onclick: 'editAttributes()' %>
+          <%= link_to ion_icon('trash-b'), facility_path(@facility), method: :delete, class: 'btn btn-danger manip-button', title: 'Delete the facility', data: { confirm: 'Are you sure?' } %>
         </div>
       </div>
     <% end %>
@@ -74,8 +74,8 @@
               Set all to...
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="#">Manual</a>
-              <a class="dropdown-item" href="#">Automatic</a>
+              <a class="dropdown-item" href="javascript:void(0)" onclick="changeDeviceMode('<%=change_controllable_device_path(@facility,'Manual' )%>', 'Manual')">Manual</a>
+              <a class="dropdown-item" href="javascript:void(0)" onclick="changeDeviceMode('<%=change_controllable_device_path(@facility)%>', 'Auto')">Automatic</a> 
             </div>
           </div>
         </div>

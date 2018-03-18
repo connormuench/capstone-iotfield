@@ -20,9 +20,6 @@ class CreateAssociations < ActiveRecord::Migration[5.1]
       t.belongs_to :point, index: true
     end
     
-    change_table :active_rules do |t|
-      t.belongs_to :controllable_device, index: true
-    end
     
     change_table :rules do |t|
       t.belongs_to :controllable_device, index: true

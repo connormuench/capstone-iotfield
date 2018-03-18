@@ -4,11 +4,15 @@ class ControllableDevice < ApplicationRecord
 
   accepts_nested_attributes_for :rules, :point
 
-  after_initialize :init
+  before_validation :init
 
   # Initialize mode and status to default values
   def init
-  	self.mode = "Manual"
-  	self.status = "Off"
+    if !self.mode
+  	  self.mode = "Manual"
+    end
+    if !self.status
+  	  self.status = "Off"
+    end
   end
 end

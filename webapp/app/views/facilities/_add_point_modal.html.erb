@@ -49,17 +49,7 @@
                 <button type="button" class="btn btn-success btn-sm" onclick="addRuleRow()"><%= ion_icon "plus" %></button>
               </div>
             </div>
-            <% require "json" %>
-            <% available_points = {} %>
-            <% current_user.facilities.each do |facility| %>
-              <% facility.points.each do |point| %>
-                <% if not available_points.key?(facility.id) %>
-                  <% available_points[facility.id] = [] %>
-                <% end %>
-                <% available_points[facility.id].push('{' + point.name + '|' + point.end_device.address + ':' + point.remote_id.to_s + '}') %>
-              <% end %>
-            <% end %>
-            <table class="table table-bordered table-hover table-sm" id="rules-table" data-points="<%= available_points.to_json %>">
+            <table class="table table-bordered table-hover table-sm" id="rules-table" data-points="<%= @available_points.to_json %>">
               <thead>
                 <tr>
                   <th scope="col">Active</th>

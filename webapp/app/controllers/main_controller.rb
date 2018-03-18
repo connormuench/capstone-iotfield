@@ -1,4 +1,7 @@
 class MainController < ApplicationController
+  before_action :authenticate_user!
+  before_action only: [:admin_panel] { check_admin '/' }
+
   def search
     @facilities = []
     @controllable_devices = []
@@ -58,5 +61,64 @@ class MainController < ApplicationController
         render json: {facilities: @facilities, controllable_devices: @controllable_devices, sensors: @sensors}
       }
     end
+  end
+
+  def visualization
+    respond_to do |format|
+      format.html {
+        @data = {}
+      }
+      format.json {
+        points_tree = []
+        current_user.facilities.each do |facility|
+          facility_tree = {id: facility.id * -1, text: facility.name, children: []}
+          facility.end_devices.each do |end_device|
+            end_device.points.each do |point|
+              quantity = 'unitless'
+              if point.records.count > 0 && point.records[0].unit == 'degC'
+                quantity = 'temperature'
+              end
+              facility_tree[:children].push({id: point.id, text: point.name, quantity: quantity})
+            end
+          end
+          points_tree.push(facility_tree)
+        end
+        render json: points_tree
+      }
+    end
+  end
+
+  def points
+    points_list = []
+    if params.include?(:point_ids)
+      params[:point_ids].each do |point_id|
+        points_list.push(Point.find(point_id))
+      end
+    end
+
+    respond_to do |format|
+      format.html {}
+      format.json {
+        render json: {y_axis: 'Temperature (degC)', x_axis: 'Time', data: chart_data_from_points(points_list)}
+      }
+    end
+  end
+
+  def admin_panel
+    @users = {}
+    User.all.each do |user|
+      @users[user.id] = {}
+    end
+
+    @facilities =  {}
+    Facility.all.each do |facility|
+      @facilities[facility.id] = {}
+    end
+
+    AccessLevel.all.each do |access_level|
+      @users[access_level.user_id][access_level.facility_id] = access_level.level
+      @facilities[access_level.facility_id][access_level.user_id] = access_level.level
+    end
+
   end
 end

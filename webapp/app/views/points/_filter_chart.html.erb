@@ -1,0 +1,21 @@
+<div class="row">
+  <div class="form-inline mx-auto mb-1">
+    <div class="input-group date mx-2" id="startDatetimepicker" data-target-input="nearest">
+      <input type="text" class="form-control datetimepicker-input" data-target="#startDatetimepicker"/>
+      <div class="input-group-append" data-target="#startDatetimepicker" data-toggle="datetimepicker">
+        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+      </div>
+    </div>
+    <span class="my-auto">to</span>
+    <div class="input-group date mx-2" id="endDatetimepicker" data-target-input="nearest">
+      <input type="text" class="form-control datetimepicker-input" data-target="#endDatetimepicker"/>
+      <div class="input-group-append" data-target="#endDatetimepicker" data-toggle="datetimepicker">
+        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+      </div>
+    </div>
+    <% if select_points %>
+      <button type="button" class="btn btn-primary mx-1" data-toggle="modal" data-target="#selectPointsModal">Select Points</button>
+    <% end %>
+    <button type="button" class="btn mx-1" onclick="updateChart()">Update</button>
+  </div>
+</div>

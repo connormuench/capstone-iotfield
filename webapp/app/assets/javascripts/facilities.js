@@ -3,17 +3,6 @@ var facId;
 
 // Fires when the page loads
 $(document).ready(function() {
-    // Set a min button width for .manip-button
-    var maxwidth = 10;
-
-    // See if there's any buttons larger and set all buttons to the same width
-    $(".manip-button").each(function() {
-        if ($(this).width() > maxwidth) {
-            maxwidth = $(this).width();
-        }
-    });
-    $(".manip-button").width(maxwidth);
-
     // Change the action of #addPointForm and toggle the controllable device section of the modal
     // when the Sensor/Controllable Device toggle is triggered
     $("input:radio[name=pointTypes]").on("change", function() {
@@ -112,21 +101,19 @@ $(document).ready(function() {
 // Adds a row to the automation rules section of #addPointModal
 function addRuleRow() {
     var row = $("#rule-rows").append($("<tr>")
+        .attr("class", "delete-on-discard")
         .append($("<td>")
             .attr("class", "text-center align-middle")
             .append($("<div>")
-                .attr("class", "form-check my-auto")
-                .append($("<label>")
-                    .attr("class", "custom-control custom-checkbox my-auto mx-auto is-active-checkbox")
-                    .append($("<input>")    // Hidden input field to placehold the unchecked state of the checkbox
-                        .attr("type", "hidden")
-                        .attr("name", "rules_attributes[][is_active]")
-                        .attr("value", "0"))
-                    .append($("<input>")    // is_active checkbox
-                        .attr("class", "custom-control-input")
-                        .attr("type", "checkbox")
-                        .attr("name", "rules_attributes[][is_active]"))
-                    .append($("<span>").attr("class", "custom-control-indicator")))))
+                .attr("class", "is-active-checkbox")
+                .append($("<input>")    // Hidden input field to placehold the unchecked state of the checkbox
+                    .attr("type", "hidden")
+                    .attr("name", "rules_attributes[][is_active]")
+                    .attr("value", "0"))
+                .append($("<input>")    // is_active checkbox
+                    .attr("class", "my-auto mx-auto")
+                    .attr("type", "checkbox")
+                    .attr("name", "rules_attributes[][is_active]"))))
         .append($("<td>")
             .append($("<div>")      // Expression input group
                 .attr("class", "input-group")
@@ -135,7 +122,7 @@ function addRuleRow() {
                     .attr("type", "text")
                     .attr("name", "rules_attributes[][expression]"))
                 .append($("<div>")      // Sensor autocomplete button
-                    .attr("class", "input-group-btn")
+                    .attr("class", "input-group-btn expression-button")
                     .on("shown.bs.dropdown", function() {
                         $(this).find("input.form-control").focus();
                     })
@@ -179,17 +166,6 @@ function addRuleRow() {
     });
 }
 
-// Function to execute immediately before form submission
-function submitted() {
-    // Disable any hidden field if its corresponding checkbox is checked
-    $(".is-active-checkbox").each(function() {
-        if ($(this).find("input:checkbox")[0].checked) {
-            $(this).find("input:hidden").attr("disabled", true);
-        }
-    });
-    return true;
-}
-
 // Function to delete an associated rule row
 // deleteButton: the button that was clicked
 function deleteRuleRow(deleteButton) {
@@ -215,7 +191,7 @@ function updateList(textField) {
             dropdown.append($("<a>")
                 .attr("class", "dropdown-item")
                 .attr("href", "#")
-                .attr("onclick", "return facilityClicked(this)")
+                .attr("onclick", "return sensorClicked(this)")
                 .html(value.replace(new RegExp(textFieldVal, "i"), function(match) {
                     return "<b>" + match + "</b>";      // Bold the query
                 })));
@@ -225,23 +201,12 @@ function updateList(textField) {
 
 // Function to add the selected sensor's ID to the expression
 function sensorClicked(element) {
-    textboxVal = $(element.closest("input.form-control")).val();
+    let expressionTextbox = $($(element.closest(".input-group-btn")).siblings("input.form-control"));
+    textboxVal = expressionTextbox.val();
     textboxVal = typeof(textboxVal) === "undefined" ? "" : textboxVal;
-    expressionTextbox = $($(element.closest(".input-group-btn")).siblings("input.form-control"))
     expressionTextbox.val(textboxVal + $(element).text());
     expressionTextbox.focus();
     return false;
-}
-
-// Function to toggle the facility's attributes to become editable form fields
-function editFacility() {
-    $(".form-toggle").toggle();
-}
-
-// Function to reset the facility's form and toggle the form fields to read-only attributes
-function discardChanges() {
-    $('#editFacilityForm').trigger("reset");
-    $(".form-toggle").toggle();   
 }
 
 // Function to toggle the disabled state of the specified JQuery element
@@ -265,4 +230,8 @@ function enableElement(element) {
     if (element.is("[disabled]")) {
         element.removeAttr("disabled");
     }
+}
+
+function changeDeviceMode(url, action) {
+    $.post(url, { type: action });
 }

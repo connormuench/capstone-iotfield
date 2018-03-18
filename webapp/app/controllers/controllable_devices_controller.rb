@@ -1,22 +1,33 @@
-class ControllableDevicesController < ApplicationController
+class ControllableDevicesController < PointsController
   require 'pi_lists'
 
-  before_action :set_controllable_device, only: [:show, :update, :destroy]
+  before_action :set_controllable_device, only: [:show, :update, :destroy, :send_command, :set_mode]
+  before_action :set_facility, only: [:show, :create, :update, :destroy, :send_command, :set_mode]
+  before_action :authenticate_user!
   before_action only: [:create, :update, :destroy] { check_admin(facility_url(Facility.find(params[:facility_id]))) }
+  before_action only: [:update, :show, :send_command, :set_mode] { authorize_user '/' }
 
   # GET /facilities/1/controllable_devices/1
   def show
+    puts('debug2')
+    records = @controllable_device.point.records
+    @data = chart_data_from_points [@controllable_device.point]
+    if records.count > 0
+      @unit = @controllable_device.point.records.first.unit
+    end
+    @access_level = current_user.access_levels.where(facility_id: @facility.id).first
+    @available_points = available_points
+    puts('debug3')
   end
 
   # POST /facilities/1/controllable_devices
   def create
     @controllable_device = ControllableDevice.new
-    facility = Facility.find(params[:facility_id])
 
     id_split = params[:remote_id].split(':')
     address = id_split[0]
     remote_id = id_split[1]
-    end_devices = facility.end_devices
+    end_devices = @facility.end_devices
     found_end_device = nil
 
     # See if the end device already exists in the database
@@ -31,7 +42,7 @@ class ControllableDevicesController < ApplicationController
     ActiveRecord::Base.transaction do
       # Create a new end device if an existing one wasn't found
       if found_end_device.nil?
-        found_end_device = facility.end_devices.new(address: address)
+        found_end_device = @facility.end_devices.new(address: address)
         if not found_end_device.save
           render :new
         end
@@ -47,6 +58,8 @@ class ControllableDevicesController < ApplicationController
         raise ActiveRecord::Rollback
       end
 
+      new_rules = []
+
       # Add any rules that came with the request
       if params.key?(:rules_attributes)
         params[:rules_attributes].each do |rule|
@@ -55,25 +68,95 @@ class ControllableDevicesController < ApplicationController
             render :new
             raise ActiveRecord::Rollback
           end
+          new_rules.push(new_rule)
         end
       end
 
       # Ensure the corresponding facility is connected before sending the 'add-point' command
-      if PiLists.instance.accepted.key?(facility.pi_id)
-        PiLists.instance.accepted[facility.pi_id][:ws].send({action: 'add-point', type: 'controllable_device', id: params[:remote_id]}.to_json)
+      if PiLists.instance.accepted.key?(@facility.pi_id)
+        ws = PiLists.instance.accepted[@facility.pi_id][:ws]
+        ws.send({action: 'add-point', type: 'controllable_device', id: params[:remote_id]}.to_json)
+        new_rules.each do |new_rule|
+          ws.send({action: 'add-rule', rule: {expression: new_rule.expression, action: new_rule.action, is_active: new_rule.is_active, server_id: new_rule.id}, point_id: params[:remote_id]})
+        end
       end
 
       # No failures if we got to this point, show the controllable device's page
-      redirect_to [facility, @controllable_device], notice: 'Controllable device was successfully created.'
+      redirect_to [@facility, @controllable_device], notice: 'Controllable device was successfully created.'
     end
   end
 
   # PATCH/PUT /facilities/1/controllable_devices/1
   def update
-    if @controllable_device.update(controllable_device_params)
-      redirect_to @controllable_device, notice: 'Controllable device was successfully updated.'
-    else
-      render :edit
+    # Establish a rollback point in case anything fails to save
+    ActiveRecord::Base.transaction do
+      # Add/update any rules that came with the request
+      if params.key?(:rules_attributes)
+        modified_rules = []
+        new_rules = []
+        updated_rules = []
+        deleted_rules = []
+        params[:rules_attributes].each do |rule|
+          if rule.key?(:id)
+            old_rule = Rule.find(rule[:id])
+            old_rule.update(rule_params(rule))
+            modified_rules.push(old_rule)
+            updated_rules.push({expression: old_rule.expression, action: old_rule.action, is_active: old_rule.is_active, server_id: old_rule.id})
+          else
+            new_rule = @controllable_device.rules.new(rule_params(rule))
+            modified_rules.push(new_rule)
+            if not new_rule.save
+              render :new
+              raise ActiveRecord::Rollback
+            end
+            new_rules.push({expression: new_rule.expression, action: new_rule.action, is_active: new_rule.is_active, server_id: new_rule.id})
+          end
+        end
+        @controllable_device.rules.each do |rule|
+          found = false
+          modified_rules.each do |modified_rule|
+            if modified_rule.id == rule.id
+              found = true
+              break
+            end
+          end
+          if !found
+            deleted_rules.push({ server_id: rule.id })
+            rule.destroy
+          end
+        end
+      else
+        deleted_rules.concat(@controllable_device.rules.map { |rule| {server_id: rule.id} })
+        @controllable_device.rules.destroy_all
+      end
+
+      if @controllable_device.point.update(point_params)
+        # Ensure the corresponding facility is connected before sending the commands for adding, editing, and removing rules
+        if PiLists.instance.accepted.key?(@facility.pi_id)
+          ws = PiLists.instance.accepted[@facility.pi_id][:ws]
+          packet = {action: 'add-rule', point_id: @controllable_device.point.end_device.address + ':' + @controllable_device.point.remote_id.to_s}
+          new_rules.each do |rule|
+            packet[:rule] = rule
+            ws.send(packet.to_json)
+          end
+          
+          packet[:action] = 'edit-rule'
+          updated_rules.each do |rule|
+            packet[:rule] = rule
+            ws.send(packet.to_json)
+          end
+
+          packet = {action: 'remove-rule'}
+          deleted_rules.each do |rule|
+            packet[:server_id] = rule[:server_id]
+            ws.send(packet.to_json)
+          end
+        end
+
+        redirect_to [@facility, @controllable_device], notice: 'Controllable device was successfully updated.'
+      else
+        render :edit
+      end
     end
   end
 
@@ -84,22 +167,45 @@ class ControllableDevicesController < ApplicationController
       @controllable_device.point.end_device.destroy
     end
 
-    facility = Facility.find(params[:facility_id])
-
     # Ensure the corresponding facility is connected before sending the 'remove-point' command
-    if PiLists.instance.accepted.key?(facility.pi_id)
+    if PiLists.instance.accepted.key?(@facility.pi_id)
       remote_id = @controllable_device.point.end_device.address + ':' + @controllable_device.point.remote_id.to_s
-      PiLists.instance.accepted[facility.pi_id][:ws].send({action: 'remove-point', type: 'controllable_device', id: remote_id}.to_json)
+      PiLists.instance.accepted[@facility.pi_id][:ws].send({action: 'remove-point', type: 'controllable_device', id: remote_id}.to_json)
     end
 
     @controllable_device.destroy
-    redirect_to facility_url(facility), notice: 'Controllable device was successfully destroyed.'
+    redirect_to facility_url(@facility), notice: 'Controllable device was successfully destroyed.'
+  end
+
+  def set_mode
+    if !@controllable_device.update(mode: params['mode'])
+      return
+    end
+    if PiLists.instance.accepted.key?(@facility.pi_id)
+      remote_id = @controllable_device.point.end_device.address + ':' + @controllable_device.point.remote_id.to_s
+      PiLists.instance.accepted[@facility.pi_id][:ws].send({action: 'set-mode', id: remote_id, mode: params['mode'].downcase}.to_json)
+    end
+  end
+
+  def send_command
+    if @controllable_device.mode.downcase != 'manual'
+      return
+    end
+
+    if PiLists.instance.accepted.key?(@facility.pi_id)
+      remote_id = @controllable_device.point.end_device.address + ':' + @controllable_device.point.remote_id.to_s
+      PiLists.instance.accepted[@facility.pi_id][:ws].send({action: 'control-device', id: remote_id, command: params['command']}.to_json)
+    end
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_controllable_device
       @controllable_device = ControllableDevice.find(params[:id])
+    end
+
+    def set_facility
+      @facility = Facility.find(params[:facility_id])
     end
 
     # Only allow a trusted parameter "white list" through
@@ -109,5 +215,14 @@ class ControllableDevicesController < ApplicationController
 
     def rule_params(rule)
       rule.permit(:is_active, :expression, :action)
+    end
+
+    def authorize_user(url)
+      current_user.access_levels.each do |access_level|
+        if access_level.facility_id == @controllable_device.point.end_device.facility.id
+          return
+        end
+      end
+      redirect_to(url, alert: 'You are not authorized to access this page.')
     end
 end

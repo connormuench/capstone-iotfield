@@ -3,6 +3,7 @@
   <head>
     <title>Webapp</title>
     <%= csrf_meta_tags %>
+    <!--%= javascript_include_tag "https://www.gstatic.com/charts/loader.js" %-->
 
     <%= stylesheet_link_tag    'application', media: 'all' %>
     <%= javascript_include_tag 'application' %>
@@ -36,7 +37,7 @@
             <!-- Visualization link -->
             <ul class="navbar-nav ml-md-2">
               <li class="nav-item">
-                <a class="nav-link" href="#">Visualization</a>
+                <%= link_to 'Visualization', visualization_path, class: 'nav-link' %>
               </li>
             </ul>
           <% end %>
@@ -52,7 +53,7 @@
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                   <%= link_to 'Profile', user_path(current_user.id), class: 'dropdown-item' %>
                   <% if current_user.is_admin %>
-                    <a class="dropdown-item" href="#">Admin Panel</a>
+                    <%= link_to 'Admin Panel', admin_panel_path, class: 'dropdown-item' %>
                   <% end %>
                   <div class="dropdown-divider"></div>
                   <%= link_to('Logout', destroy_user_session_path, method: :delete, class: "dropdown-item") %>

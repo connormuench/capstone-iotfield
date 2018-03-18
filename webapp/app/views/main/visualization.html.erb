@@ -1,0 +1,112 @@
+<div class="mt-5"></div>
+<%= render partial: 'points/filter_chart.html.erb', locals: { select_points: true } %>
+
+<div class="modal fade" id="selectPointsModal" tabindex="-1" role="dialog" aria-labelledby="selectPointsModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="selectPointsModalLabel">Select Points</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="card">
+          <div id="tree"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="updatePoints($('#selectPointsModal'))">Update Points</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="pointChart">
+  <%= line_chart @data, id: 'chart' %>
+  <div class="form-check text-center">
+    <input class="form-check-input" type="checkbox" id="autoUpdateChart" checked>
+    <label class="form-check-label mx-auto" for="autoUpdateChart">Auto-update</label>
+  </div>
+</div>
+
+<script>
+  var tree = $('#tree').tree({
+    dataSource: '/visualization.json',
+    primaryKey: 'id',
+    checkboxes: true,
+    cascadeCheck: false,
+    uiLibrary: 'bootstrap4',
+    iconsLibrary: 'fontawesome',
+    dataBound: function() {
+      $("#tree").find("[data-role='node']").each(function(i, element) {
+        record = tree.getDataById($(element).data("id"));
+        if (record.id > 0) {
+          records.push(record);
+        } else {
+          $(element).children("div").find("span[data-role='checkbox']").hide();
+        }
+      });
+    }
+  });
+
+  var records = [];
+  points = [];
+
+  tree.on('checkboxChange', function(e, node, record, state) {
+    let checkedNodes = tree.getCheckedNodes();
+    if (state === 'unchecked' && checkedNodes.length === 0) {
+      records.forEach(function(element) {
+        tree.enable(tree.getNodeById(element.id));
+      });
+      return;
+    }
+    let onlyQuantity = record.quantity;
+    records.forEach(function(element) {
+      let currentNode = tree.getNodeById(element.id);
+      if (element.quantity !== onlyQuantity) {
+        tree.disable(currentNode);
+      } else {
+        tree.enable(currentNode);
+      }
+    });
+  });
+
+  function updatePoints($modal) {
+    $.get('/points.json', {point_ids: tree.getCheckedNodes()}, function(data) {
+      chart = Chartkick.charts["chart"];
+      chart.updateData(data.data, {ytitle: data.y_axis, xtitle: data.x_axis});
+      rawChartData = chart.getData();
+      updateChart();
+      $modal.modal("hide");
+      tree.getCheckedNodes().forEach(function(id) {
+        points.push(App.cable.subscriptions.create({channel: "PointsChannel", point_id: id}, {
+            connected: function() {
+                console.log("connected");
+            },
+            disconnected: function() {
+                console.log("disconnected");
+            }, 
+            received: function(data) {
+                rawChartData.forEach(function(series) {
+                    if (series.id === data.point_id) {
+                        series.data.push([moment(data.created_at).toDate(), data.value]);
+                    }
+                });
+                if ($("#autoUpdateChart").is(":checked")) {
+                    if ($("#pointChart").is(":hidden")) {
+                        $("#pointChart").show();
+                    }
+                    updateChart();
+                }
+            }
+        }));
+      });
+    });
+    points.forEach(function(subscription) {
+      App.cable.subscriptions.remove(subscription);
+    });
+    points = [];
+  }
+</script>

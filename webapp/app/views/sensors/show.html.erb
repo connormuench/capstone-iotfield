@@ -1,4 +1,11 @@
-<p id="notice"><%= notice %></p>
+<%= form_for [@facility, @sensor], method: :patch, html: {id: 'editForm'} do |f| %>
+  <%= render partial: 'points/show.html.erb', locals: { point: @sensor.point, point_type: "sensor", path: facility_sensor_path(@facility.id,@sensor) } %>
+<% end %>
 
-<%= link_to 'Edit', edit_sensor_path(@sensor) %> |
-<%= link_to 'Back', sensors_path %>
+<%= render partial: 'points/filter_chart.html.erb', locals: { select_points: false } %>
+
+
+
+<%= render partial: 'points/show_chart.html.erb', locals: {point_id: @sensor.point.id} %>
+
+

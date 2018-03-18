@@ -12,10 +12,19 @@
 //
 //= require jquery3
 //= require rails-ujs
-//= require_tree .
 
 //= require popper
 //= require bootstrap-sprockets
+//= require moment
+//= require tempusdominus-bootstrap-4.js
+
+//= require gijgo/core.min
+//= require gijgo/checkbox.min
+//= require gijgo/tree.min
+
+//= require Chart.bundle
+//= require chartkick
+//= require_tree .
 
 // Function to populate the sitewide search box dropdown
 function autocompleteSearch(textbox) {
@@ -67,6 +76,17 @@ function autocompleteSearch(textbox) {
 
 // Fires when the page loads
 $(document).ready(function() {
+    // Set a min button width for .manip-button
+    var maxwidth = 10;
+
+    // See if there's any buttons larger and set all buttons to the same width
+    $(".manip-button").each(function() {
+        if ($(this).width() > maxwidth) {
+            maxwidth = $(this).width();
+        }
+    });
+    $(".manip-button").width(maxwidth);
+
     // Fires when the search box is clicked
     $("#searchBox").on("click", function(event) {
         // Prevent the default dropdown functionality when the text box is clicked, since it's buggy with text boxes
@@ -104,4 +124,28 @@ function hideSearchDropdown() {
     if (dropdown.hasClass("show")) {
         dropdown.removeClass("show").find(".dropdown-menu").removeClass("show");
     }
+}
+
+
+// Function to reset the form and toggle the form fields to read-only attributes
+function discardChanges(form) {
+    form.trigger("reset");
+    $(".form-toggle").toggle();
+    $(".delete-on-discard").remove();
+}
+
+// Function to toggle the attributes to become editable form fields
+function editAttributes() {
+    $(".form-toggle").toggle();
+}
+
+// Function to execute immediately before form submission
+function submitted() {
+    // Disable any hidden field if its corresponding checkbox is checked
+    $(".is-active-checkbox").each(function() {
+        if ($(this).find("input:checkbox")[0].checked) {
+            $(this).find("input:hidden").attr("disabled", true);
+        }
+    });
+    return true;
 }
