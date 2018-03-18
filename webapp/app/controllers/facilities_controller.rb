@@ -2,7 +2,7 @@ class FacilitiesController < ApplicationController
   require 'pi_lists'
   require 'securerandom'
 
-  before_action :set_facility, only: [:show, :edit, :update, :destroy, :addable_points, :set_permissions]
+  before_action :set_facility, only: [:show, :edit, :update, :destroy, :addable_points, :set_permissions, :change_control]
   before_action only: [:create, :update, :destroy, :set_permissions] { check_admin facilities_url }
   before_action :authenticate_user!
   before_action only: [:update, :show] { authorize_user facilities_url }
@@ -121,28 +121,25 @@ class FacilitiesController < ApplicationController
     redirect_to admin_panel_path, notice: 'User permissions were successfully updated.'
   end
 
-  def change_control_auto
+  def change_control
+    @controllable_devices = []
+    @facility.end_devices.each do |end_device|
+      @controllable_devices.concat(end_device.controllable_devices)
+    end
+    msg={action: 'set-mode', id: 'remote_id', mode: params[:type]}.to_json
     @controllable_devices.each do |device|
-      device.mode='auto'
+      device.mode=params[:type]
       device.save()
       if PiLists.instance.accepted.key?(@facility.pi_id)
         remote_id = device.point.end_device.address + ':' +device.point.remote_id.to_s
-        PiLists.instance.accepted[@facility.pi_id][:ws].send({action: 'set-mode', id: remote_id, mode: 'auto'}.to_json)
+        msg[:id]=remote_id
+        PiLists.instance.accepted[@facility.pi_id][:ws].send(msg.to_json)
       end
     end
   end
 
 
-  def change_control_manual
-    @controllable_devices.each do |device|
-      device.mode='manual'
-      device.save
-      if PiLists.instance.accepted.key?(@facility.pi_id)
-        remote_id = device.point.end_device.address + ':' +device.point.remote_id.to_s
-        PiLists.instance.accepted[@facility.pi_id][:ws].send({action: 'set-mode', id: remote_id, mode: 'manual'}.to_json)
-      end
-    end
-  end
+ 
 
   private
     def set_facility

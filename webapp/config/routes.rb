@@ -8,8 +8,9 @@ Rails.application.routes.draw do
 
   get '/facilities/addable', to: 'facilities#addable_facilities'
   get '/facilities/:id/addable', to: 'facilities#addable_points'
-  get '/facilities/:id/manual', to: 'facilities#change_control_manual'
-  get '/facilities/:id/auto', to: 'facilities#change_control_auto'
+
+  post '/facilities/:id/mode', to: 'facilities#change_control',  as:'change_controllable_device_manual'
+ 
 
 
   post '/facilities/:facility_id/controllable_devices/:id/set_mode', to: 'controllable_devices#set_mode', as: 'set_controllable_device_mode'

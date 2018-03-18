@@ -231,3 +231,7 @@ function enableElement(element) {
         element.removeAttr("disabled");
     }
 }
+
+function changeDeviceMode(url, action) {
+    $.post(url, { type: action });
+}
