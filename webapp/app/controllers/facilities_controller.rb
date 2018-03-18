@@ -121,6 +121,29 @@ class FacilitiesController < ApplicationController
     redirect_to admin_panel_path, notice: 'User permissions were successfully updated.'
   end
 
+  def change_control_auto
+    @controllable_devices.each do |device|
+      device.mode='auto'
+      device.save()
+      if PiLists.instance.accepted.key?(@facility.pi_id)
+        remote_id = device.point.end_device.address + ':' +device.point.remote_id.to_s
+        PiLists.instance.accepted[@facility.pi_id][:ws].send({action: 'set-mode', id: remote_id, mode: 'auto'}.to_json)
+      end
+    end
+  end
+
+
+  def change_control_manual
+    @controllable_devices.each do |device|
+      device.mode='manual'
+      device.save
+      if PiLists.instance.accepted.key?(@facility.pi_id)
+        remote_id = device.point.end_device.address + ':' +device.point.remote_id.to_s
+        PiLists.instance.accepted[@facility.pi_id][:ws].send({action: 'set-mode', id: remote_id, mode: 'manual'}.to_json)
+      end
+    end
+  end
+
   private
     def set_facility
       @facility = Facility.find(params[:id])
