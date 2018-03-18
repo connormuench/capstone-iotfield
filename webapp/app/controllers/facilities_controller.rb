@@ -126,7 +126,7 @@ class FacilitiesController < ApplicationController
     @facility.end_devices.each do |end_device|
       @controllable_devices.concat(end_device.controllable_devices)
     end
-    msg={action: 'set-mode', id: 'remote_id', mode: params[:type]}.to_json
+    msg={action: 'set-mode', id: 'remote_id', mode: params[:type]}
     @controllable_devices.each do |device|
       device.mode=params[:type]
       device.save()
@@ -137,9 +137,6 @@ class FacilitiesController < ApplicationController
       end
     end
   end
-
-
- 
 
   private
     def set_facility
